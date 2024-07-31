@@ -1,0 +1,69 @@
+Project Outline
+
+Idea: Creating a program that makes it easier for WTUS members to use Alerting and Information Sharing Tools in OBS to continue the mission of communicating Timely and Accurate Weather Information to the General Public.
+
+OBS Tools:
+    - Alerts for New Warnings and Watches
+    - Alert Counters
+    - SPC Outlook Information
+    - Warning Feed
+
+Other Tools:
+    - Alert Display Web Server/ Website
+
+Project uses Python 3.12.3
+
+Required Packages:
+    - Requests
+    - Plyer
+    - OBSWebSocket
+    - os
+    - Pystray
+    - PIL
+    - threading
+    - datetime
+    - dateutil
+    - atexit
+    - apscheduler
+    - pytz
+    - sqlite3
+    - flask
+    - tkinter
+    - customtkinter
+
+Other Tools Required for Project:
+    - HTML/CSS/JS
+    - Graphic Design Platform
+
+
+In Depth Info on OBS Tools:
+    - Alerts for New Warnings and Watches
+        - This tool will use the NWS API to access and retreive the latest official weather alert information and detect new or updated weather alerts and then display the new or updated information on the client's OBS.
+    
+    - Alert Counters
+        - This tool will use the NWS API to access and retreive the latest official weather alert information and count the amount of each type of tracked alert and display the counter on the client's OBS.
+    
+    - SPC Outlook Information
+        - This tool will use the NWS SPC geojson file to access and retreive the latest SPC Categorical outlook and analyze the file to determine the highest outlook probability and share that information on the client's OBS.
+    
+    - Warning Feed
+        - This tool will use the NWS API to access and retreive the latest official weather alert information display the most up to date warning information on loop on the client's OBS
+
+    - Alert Display Feed
+        - This tool will create a local Flask webserver to display all of the detected weather alerts and their respective hazard and timing information to assist in live coverage operations
+
+Timeline:
+    - Day 1:
+        - Create Outline and Project Plan
+        - Install all needed Packages
+        - Create the basic structure of the project
+        - Begin transferring code from previous projects
+    
+    - Day 2:
+        - Complete transferring code from previous projects
+        - Optimize the use of the code
+        - Complete the GUI
+        - Complete any Last minute adjustments
+        - Package Program in a .exe format
+            - Test Packaged Program
+        - Deploy Program to WTUS Team
