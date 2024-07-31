@@ -41,10 +41,6 @@ obs_source_settings = {
     "Alert-TOA": 12
 }'''
 
-# Connect to the OBS WebSocket
-ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
-ws.connect()
-
 # Create the 'warnings' directory if it doesn't exist
 if not os.path.exists('warnings'):
     os.makedirs('warnings')
@@ -320,22 +316,35 @@ def read_from_file(filename):
         return 0
 
 def get_current_scene():
+    # Connect to the OBS WebSocket
+    ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+    ws.connect()
     current_scene = ws.call(obs_requests.GetCurrentProgramScene())
+    ws.disconnect()
     return current_scene.get("name"), current_scene.get("sceneUuid")
 
 def get_source_id(source_name, scene_name, scene_uuid):
+    # Connect to the OBS WebSocket
+    ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+    ws.connect()
     scene_items = ws.call(obs_requests.GetSceneItemList(sceneName=scene_name, sceneUuid=scene_uuid))
     for item in scene_items.get("sceneItems", []):
         if item["sourceName"] == source_name:
             return item["sourceItemId"]
+    ws.disconnect()
     return None
 
 def get_scene_and_source_info(source_name):
+
     if not obs_socket_ip or not obs_socket_port or not obs_socket_password:
         return None, None, None
 
     try:
         from obswebsocket import obsws, requests as obs_requests
+
+        # Connect to the OBS WebSocket
+        ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+        ws.connect()
 
         scenes_response = ws.call(obs_requests.GetSceneList())
         response_dict = scenes_response.__dict__
@@ -355,6 +364,7 @@ def get_scene_and_source_info(source_name):
                     for item in scene_items:
                         if item["sourceName"] == source_name:
                             return current_scene_name, current_scene_uuid, item["sceneItemId"]
+        ws.disconnect()
     except ImportError:
         pass
 
@@ -440,6 +450,10 @@ def display_alert(event, notification_message, area_desc):
     write_to_file("Warning Area.txt", area_desc)
     time.sleep(2)
 
+    # Connect to the OBS WebSocket
+    ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+    ws.connect()
+
     source_name = obs_source_settings.get(event)
     scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
 
@@ -448,6 +462,8 @@ def display_alert(event, notification_message, area_desc):
     ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
 
     time.sleep(3)
+
+    ws.disconnect()
 
 system_thray_thread = threading.Thread(target=hide_to_system_tray)
 system_thray_thread.start()
