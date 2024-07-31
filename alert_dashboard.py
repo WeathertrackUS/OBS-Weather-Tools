@@ -258,5 +258,5 @@ def update_active_alerts():
     with app.app_context():
         fetch_and_update_alerts()
 
-if __name__ == '__main__':
+def dashboard_kickstart():
     app.run(debug=True, host='localhost', port=5000)
