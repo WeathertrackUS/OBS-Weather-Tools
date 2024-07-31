@@ -13,7 +13,7 @@ import database
 from dateutil import parser, tz
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
-from dashboard import app, update_active_alerts
+from alert_dashboard import app, update_active_alerts
 import pytz
 
 database.create_table()
