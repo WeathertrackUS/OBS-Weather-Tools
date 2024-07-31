@@ -19,9 +19,9 @@ import pytz
 database.create_table()
 
 # OBS WebSocket settings
-obs_socket_ip = "216.16.108.109"  # Replace with your OBS WebSocket IP
+obs_socket_ip = "216.16.96.60"  # Replace with your OBS WebSocket IP
 obs_socket_port = 4455  # Replace with your OBS WebSocket port
-obs_socket_password = "wuqYpn5glvxmaudo"  # Replace with your OBS WebSocket password
+obs_socket_password = "VJFfpubelSgccfYR"  # Replace with your OBS WebSocket password
 
 # OBS source settings
 obs_source_settings = {
@@ -458,6 +458,7 @@ scheduler.start()'''
 
 atexit.register(update_active_alerts_and_exit)
 
-while True:
-    fetch_alerts()
-    time.sleep(5)  # Wait for 5 seconds before checking for new alerts
+def kickstart():
+    while True:
+        fetch_alerts()
+        time.sleep(5)  # Wait for 5 seconds before checking for new alerts
