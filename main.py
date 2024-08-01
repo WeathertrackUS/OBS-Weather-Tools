@@ -1,7 +1,7 @@
 # Main.py
 
-from alert_main import kickstart
-from alert_dashboard import dashboard_kickstart
+from live_alert_main import kickstart
+from live_alert_dashboard import dashboard_kickstart
 import tkinter
 import customtkinter as ctk
 import threading

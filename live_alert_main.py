@@ -8,12 +8,12 @@ import pystray
 from PIL import Image
 import threading
 from datetime import datetime, timezone
-import alerts
+import live_alerts_processing
 import database
 from dateutil import parser, tz
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
-from alert_dashboard import app, update_active_alerts
+from live_alert_dashboard import app, update_active_alerts
 import pytz
 
 database.create_table()
@@ -409,7 +409,7 @@ def fetch_alerts():
 
             if not database.alert_exists(identifier):
                 # This is a new alert
-                event, notification_message, area_desc, expires_datetime, description = alerts.process_alert(identifier, properties, sent_datetime, area_desc)
+                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
                 display_alert(event, notification_message, area_desc)
                 database.insert_alert(identifier, sent_datetime, expires_datetime, properties)
             else:
@@ -424,7 +424,7 @@ def fetch_alerts():
 
                 if sent_datetime != existing_sent_datetime:
                     # This is an update to an existing alert
-                    event, notification_message, area_desc, expires_datetime = alerts.process_alert(identifier, properties, sent_datetime, area_desc)
+                    event, notification_message, area_desc, expires_datetime = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
                     display_alert(event, notification_message, area_desc)
                     database.update_alert(identifier, sent_datetime, expires_datetime, properties)
     update_active_alerts()
