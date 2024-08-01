@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 import os
 import re
 import pytz
+import multiprocessing
 
 base_dir = '.'
 
@@ -258,5 +259,6 @@ def update_active_alerts():
     with app.app_context():
         fetch_and_update_alerts()
 
-def dashboard_kickstart():
-    app.run(debug=True, host='localhost', port=5000)
+def dashboard_kickstart(stop_event):
+    while not stop_event.is_set():
+        app.run(debug=False, host='localhost', port=5000)
