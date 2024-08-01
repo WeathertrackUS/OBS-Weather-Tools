@@ -39,6 +39,7 @@ obs_source_settings = {
     "Alert-FFW": 11,
     "Alert-SVA": 8,
     "Alert-TOA": 12
+    "Alert-SPS": 13
 }'''
 
 # Create the 'warnings' directory if it doesn't exist
@@ -68,6 +69,8 @@ warning_files = {
     'FFW.txt': 'Flash Flood Warnings: 0',
     'Considerable FFW.txt': 'Considerable Flash Flood Warnings: 0',
     'FFE.txt': 'Flash Flood Emergencies: 0',
+
+    'SPS.txt': 'Special Weather Statements: 0',
 }
 
 warning_count_files = {
@@ -90,6 +93,8 @@ warning_count_files = {
     'FFW.txt': '0',
     'Considerable FFW.txt': '0',
     'FFE.txt': '0',
+
+    'SPS.txt': '0',
 }
 
 # Create the warning files with their initial content
@@ -375,7 +380,7 @@ def fetch_alerts():
     params = {
         "status": "actual",
         "message_type": "alert,update",
-        "code": 'TOR,TOA,SVR,SVA,FFW,SVS',
+        "code": 'TOR,TOA,SVR,SVA,FFW,SVS,SPS',
         "region_type": "land",
         "urgency": "Immediate,Future,Expected",
         "severity": "Extreme,Severe,Moderate",

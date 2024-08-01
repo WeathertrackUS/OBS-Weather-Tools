@@ -71,6 +71,11 @@ th:not(:last-child), td:not(:last-child) {
     color: black;
 }
 
+.ticker-table tbody tr td:nth-child(6).special-weather-statement {
+    background-color: #18e9f0;
+    color: black;
+}
+
 /* Alert table styles */
 .alert-table {
     width: 100%;

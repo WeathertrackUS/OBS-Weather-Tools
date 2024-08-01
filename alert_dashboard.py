@@ -46,13 +46,17 @@ def index():
     
     flash_flood_warning_total_count = read_from_file(os.path.join('count', "FFW Total.txt"))
 
+    special_weather_statement_count = read_from_file(os.path.join('count', "SPS.txt"))
+
     return render_template('index.html', active_alerts=active_alerts,
                            tornado_warning_total_count=tornado_warning_total_count,
                            severe_thunderstorm_warning_total_count=severe_thunderstorm_warning_total_count,
                            tornado_watch_count=tornado_watch_count,
                            severe_thunderstorm_watch_count=severe_thunderstorm_watch_count,
-                           flash_flood_warning_total_count=flash_flood_warning_total_count
-    )
+                           flash_flood_warning_total_count=flash_flood_warning_total_count,
+                           special_weather_statement_count=special_weather_statement_count
+                           )
+    
 
 from collections import OrderedDict
 
@@ -62,7 +66,7 @@ ALERT_PRIORITY = OrderedDict([
     ('Flash Flood Warning', 3),
     ('Tornado Watch', 4),
     ('Severe Thunderstorm Watch', 5),
-    # Add more alert types if needed
+    ('Special Weather Statement', 6)
 ])
 
 def sort_alerts(alerts):

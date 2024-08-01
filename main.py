@@ -21,7 +21,7 @@ alert_stop_event = threading.Event()
 dashboard_stop_event = threading.Event()
 
 alerts_thread = None
-dashboard_process = None
+dashboard_thread = None
 
 alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
@@ -40,17 +40,15 @@ dashboard_checkbox = ctk.CTkCheckBox(main_frame, text="Dashboard", variable=dash
 dashboard_checkbox.grid(row=1, column=0, padx=10, pady=10)
 
 def start_dashboard():
-    global dashboard_process
-    if dashboard_process is None or not dashboard_process.is_alive():
+    global dashboard_thread
+    if dashboard_thread is None or not dashboard_thread.is_alive():
         dashboard_thread = threading.Thread(target=dashboard_kickstart, args=(dashboard_stop_event,))
         dashboard_thread.start()
 
 def stop_dashboard():
-    global dashboard_process
-    if dashboard_process and dashboard_process.is_alive():
-        dashboard_process.terminate()
-        dashboard_process.join()
-        dashboard_process = None
+    global dashboard_thread
+    if dashboard_thread and dashboard_thread.is_alive():
+        dashboard_thread._stop()
 
 def confirm_action():
     global alerts_thread
