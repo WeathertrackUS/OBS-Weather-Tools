@@ -1,0 +1,123 @@
+table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: 0 auto; /* Center the table */
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+th:not(:last-child), td:not(:last-child) {
+    border-right: 1px solid #ddd;
+}
+
+/* Ticker table styles */
+.ticker-table {
+    width: 100%; /* Stretch the ticker table across the screen */
+    margin-bottom: 20px;
+    margin: 0 auto;
+}
+
+.ticker-table th:nth-child(0), .ticker-table td:nth-child(0) {
+    width: 20%;
+}
+
+.ticker-table th:nth-child(1), .ticker-table td:nth-child(1) {
+    width: 20%;
+}
+
+.ticker-table th:nth-child(2), .ticker-table td:nth-child(2) {
+    width: 20%;
+}
+
+.ticker-table th:nth-child(3), .ticker-table td:nth-child(3) {
+    width: 20%;
+}
+
+.ticker-table th:nth-child(4), .ticker-table td:nth-child(4) {
+    width: 20%;
+}
+
+/* Color-coded ticker table columns */
+.ticker-table tbody tr td:nth-child(1).tornado-warning {
+    background-color: #f24130;
+    color: white;
+}
+
+.ticker-table tbody tr td:nth-child(2).severe-thunderstorm-warning {
+    background-color: yellow;
+    color: black;
+}
+
+.ticker-table tbody tr td:nth-child(3).tornado-watch {
+    background-color: #f054d8;
+    color: black;
+}
+
+.ticker-table tbody tr td:nth-child(4).severe-thunderstorm-watch {
+    background-color: #af54f0;
+    color: white;
+}
+
+.ticker-table tbody tr td:nth-child(5).flash-flood-warning {
+    background-color: #34f230;
+    color: black;
+}
+
+/* Alert table styles */
+.alert-table {
+    width: 100%;
+    margin: 0 auto; /* Center the alert table */
+}
+
+.alert-table th:first-child, .alert-table td:first-child {
+    width: 13%;
+}
+
+.alert-table th:nth-child(2), .alert-table td:nth-child(4) {
+    width: 12%;
+}
+
+.alert-table th:nth-child(3), .alert-table td:nth-child(3) {
+    width: 40%;
+}
+
+.alert-table th:nth-child(4), .alert-table td:nth-child(4) {
+    width: 12%;
+}
+
+.alert-table th:last-child, .alert-table td:last-child {
+    width: 36%;
+}
+
+/* Alert type styles (for table header) */
+.tornado-warning {
+    background-color: #f24130;
+}
+
+.severe-thunderstorm-warning {
+    background-color: yellow;
+}
+
+.flash-flood-warning {
+    background-color: #34f230;
+}
+
+.tornado-watch {
+    background-color: #f054d8;
+}
+
+.severe-thunderstorm-watch {
+    background-color: #af54f0;
+}
+
+.special-weather-statement {
+    background-color: #18e9f0
+}
