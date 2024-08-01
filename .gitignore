@@ -1,3 +1,5 @@
 __pycache__/
-warnings/
-count/
+/.venv
+/warnings
+/count
+alerts.db
