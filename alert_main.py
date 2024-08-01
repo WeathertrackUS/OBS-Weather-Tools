@@ -404,7 +404,7 @@ def fetch_alerts():
 
             if not database.alert_exists(identifier):
                 # This is a new alert
-                event, notification_message, area_desc, expires_datetime = alerts.process_alert(identifier, properties, sent_datetime, area_desc)
+                event, notification_message, area_desc, expires_datetime, description = alerts.process_alert(identifier, properties, sent_datetime, area_desc)
                 display_alert(event, notification_message, area_desc)
                 database.insert_alert(identifier, sent_datetime, expires_datetime, properties)
             else:
@@ -474,7 +474,10 @@ scheduler.start()'''
 
 atexit.register(update_active_alerts_and_exit)
 
-def kickstart():
-    while True:
+def kickstart(stop_event):
+    database.create_table()
+    database.clear_database()
+    print('alerts are running')
+    while not stop_event.is_set():
         fetch_alerts()
         time.sleep(5)  # Wait for 5 seconds before checking for new alerts
