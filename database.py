@@ -65,3 +65,10 @@ def update_alert(identifier, sent_datetime, expires_datetime, properties):
               (sent_datetime_str, expires_datetime_str, str(properties), identifier))
     conn.commit()
     conn.close()
+
+def clear_database():
+    conn = sqlite3.connect('alerts.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM sent_alerts')
+    conn.commit()
+    conn.close()
