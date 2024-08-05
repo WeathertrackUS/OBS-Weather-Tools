@@ -7,7 +7,7 @@ import time
 
 
 # OBS WebSocket settings
-obs_socket_ip = "216.16.96.60"  
+obs_socket_ip = "216.16.115.246"  
 obs_socket_port = 4455  
 obs_socket_password = "VJFfpubelSgccfYR" 
 
@@ -107,7 +107,7 @@ endpoint = "https://api.weather.gov/alerts/active"
 params = {
     "status": "actual",
     "message_type": "alert,update",
-    "code": 'TOR,TOA,SVR,SVA,FFW,SVS,SPS',
+    "code": 'TOR,SVR,FFW,SVS',
     "region_type": "land",
     "urgency": "Immediate,Future,Expected",
     "severity": "Extreme,Severe,Moderate",
@@ -117,26 +117,35 @@ params = {
 
 response = requests.get(endpoint, params=params)
 
-def fetch_alerts():
-    while True:
+def fetch_alerts(stop_event):
+    while not stop_event.is_set():
         if response.status_code == 200:
             data = response.json()
             features = data["features"]
 
             for alert in features:
-                properties = alert["properties"]
+                while not stop_event.is_set():
+                    properties = alert["properties"]
 
-                event = properties["event"]
-                identifier = properties["id"]
-                description = properties["description"]
-                instruction = properties["instruction"]
-                sent = properties["sent"]
+                    event = properties["event"]
+                    identifier = properties["id"]
+                    description = properties["description"]
+                    instruction = properties["instruction"]
+                    sent = properties["sent"]
 
-                sent_datetime = parser.parse(sent).astimezone(pytz.utc)
+                    parameters = properties["parameters"]
+                    headline = parameters["NWSheadline"]
 
-                warning_text = (f'{description}   Protective Actions: {instruction}')
+                    sent_datetime = parser.parse(sent).astimezone(pytz.utc)
 
-                processing(event, warning_text)
+                    if headline:
+                        warning_text = (f'{headline}   {description}   Protective Actions: {instruction}')
+                    else:
+                        warning_text = (f'{description}   Protective Actions: {instruction}')
+
+                    processing(event, warning_text)
+        else:
+            pass
 
 def processing(event, warning_text):
     write_to_file("headerText/header1Text.txt", event)
@@ -166,5 +175,3 @@ def display(source):
 def kickstart(stop_event):
     while not stop_event.is_set():
         fetch_alerts(stop_event)
-
-fetch_alerts()
