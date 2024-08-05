@@ -16,8 +16,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from live_alert_dashboard import app, update_active_alerts
 import pytz
 
-database.create_table()
-
 # OBS WebSocket settings
 obs_socket_ip = "216.16.96.60"  # Replace with your OBS WebSocket IP
 obs_socket_port = 4455  # Replace with your OBS WebSocket port
@@ -335,6 +333,7 @@ def get_source_id(source_name, scene_name, scene_uuid):
     scene_items = ws.call(obs_requests.GetSceneItemList(sceneName=scene_name, sceneUuid=scene_uuid))
     for item in scene_items.get("sceneItems", []):
         if item["sourceName"] == source_name:
+            ws.disconnect()
             return item["sourceItemId"]
     ws.disconnect()
     return None
@@ -345,8 +344,6 @@ def get_scene_and_source_info(source_name):
         return None, None, None
 
     try:
-        from obswebsocket import obsws, requests as obs_requests
-
         # Connect to the OBS WebSocket
         ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
         ws.connect()
@@ -368,6 +365,7 @@ def get_scene_and_source_info(source_name):
 
                     for item in scene_items:
                         if item["sourceName"] == source_name:
+                            ws.disconnect()
                             return current_scene_name, current_scene_uuid, item["sceneItemId"]
         ws.disconnect()
     except ImportError:
@@ -407,13 +405,13 @@ def fetch_alerts():
             sent_datetime = parser.parse(sent).astimezone(pytz.utc)
             expires_datetime = parser.parse(expires).astimezone(pytz.utc)
 
-            if not database.alert_exists(identifier):
+            if not database.alert_exists(identifier, 'sent_alerts'):
                 # This is a new alert
                 event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
                 display_alert(event, notification_message, area_desc)
-                database.insert_alert(identifier, sent_datetime, expires_datetime, properties)
+                database.insert(identifier, sent_datetime, expires_datetime, properties, 'sent_alerts')
             else:
-                existing_alert = database.get_alert(identifier)
+                existing_alert = database.get_alert(identifier, 'sent_alerts')
                 existing_sent_datetime_str = existing_alert[1]
                 existing_expires_datetime_str = existing_alert[2]
                 existing_properties = existing_alert[3]
@@ -426,7 +424,7 @@ def fetch_alerts():
                     # This is an update to an existing alert
                     event, notification_message, area_desc, expires_datetime = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
                     display_alert(event, notification_message, area_desc)
-                    database.update_alert(identifier, sent_datetime, expires_datetime, properties)
+                    database.update(identifier, sent_datetime, expires_datetime, properties, 'sent_alerts')
     update_active_alerts()
 
 def update_active_alerts_and_exit():
@@ -480,9 +478,8 @@ scheduler.start()'''
 atexit.register(update_active_alerts_and_exit)
 
 def kickstart(stop_event):
-    database.create_table()
-    database.clear_database()
-    print('alerts are running')
     while not stop_event.is_set():
+        database.create_table('sent_alerts', '(id TEXT PRIMARY KEY, sent_datetime TEXT, expires_datetime TEXT, properties TEXT)')
+        database.clear_database('sent_alerts')
         fetch_alerts()
         time.sleep(5)  # Wait for 5 seconds before checking for new alerts
