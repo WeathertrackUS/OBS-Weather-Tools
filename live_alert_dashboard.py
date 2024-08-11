@@ -111,12 +111,12 @@ def fetch_and_update_alerts():
     @return None
     """
     active_alerts = []
-    alerts = database.get_all_alerts()
+    alerts = database.get_all_alerts(table_name="sent_alerts")
     current_time = datetime.now(timezone.utc)
     for alert in alerts:
         identifier, sent_datetime_str, expires_datetime_str, properties_str = alert
-
-        sent_datetime = datetime.strptime(sent_datetime_str, '%Y-%m-%d %H:%M:%S')
+        
+        sent_datetime = datetime.strptime(sent_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
         expires_datetime = datetime.strptime(expires_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
         properties = eval(properties_str)  # Convert the string back to a dictionary
 

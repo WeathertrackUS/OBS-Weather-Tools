@@ -17,7 +17,7 @@ from live_alert_dashboard import app, update_active_alerts
 import pytz
 
 # OBS WebSocket settings
-obs_socket_ip = "216.16.96.60"  # Replace with your OBS WebSocket IP
+obs_socket_ip = "216.16.115.246"  # Replace with your OBS WebSocket IP
 obs_socket_port = 4455  # Replace with your OBS WebSocket port
 obs_socket_password = "VJFfpubelSgccfYR"  # Replace with your OBS WebSocket password
 
@@ -409,7 +409,7 @@ def fetch_alerts():
                 # This is a new alert
                 event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
                 display_alert(event, notification_message, area_desc)
-                database.insert(identifier, sent_datetime, expires_datetime, properties, 'sent_alerts')
+                database.insert(identifier=identifier, sent_datetime=sent_datetime, expires_datetime=expires_datetime, properties=properties, table_name='sent_alerts')
             else:
                 existing_alert = database.get_alert(identifier, 'sent_alerts')
                 existing_sent_datetime_str = existing_alert[1]
@@ -424,7 +424,7 @@ def fetch_alerts():
                     # This is an update to an existing alert
                     event, notification_message, area_desc, expires_datetime = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
                     display_alert(event, notification_message, area_desc)
-                    database.update(identifier, sent_datetime, expires_datetime, properties, 'sent_alerts')
+                    database.update(identifier=identifier, sent_datetime=sent_datetime, expires_datetime=expires_datetime, properties=properties, table_name='sent_alerts')
     update_active_alerts()
 
 def update_active_alerts_and_exit():

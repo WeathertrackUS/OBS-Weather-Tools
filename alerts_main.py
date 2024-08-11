@@ -123,27 +123,29 @@ def fetch_alerts(stop_event):
             data = response.json()
             features = data["features"]
 
-            for alert in features:
-                while not stop_event.is_set():
-                    properties = alert["properties"]
+            if alert in features:
+                for alert in features:
+                    while not stop_event.is_set():
+                        properties = alert["properties"]
 
-                    event = properties["event"]
-                    identifier = properties["id"]
-                    description = properties["description"]
-                    instruction = properties["instruction"]
-                    sent = properties["sent"]
+                        event = properties["event"]
+                        description = properties["description"]
+                        instruction = properties["instruction"]
+                        sent = properties["sent"]
 
-                    parameters = properties["parameters"]
-                    headline = parameters["NWSheadline"]
+                        parameters = properties["parameters"]
+                        headline = parameters["NWSheadline"]
 
-                    sent_datetime = parser.parse(sent).astimezone(pytz.utc)
+                        sent_datetime = parser.parse(sent).astimezone(pytz.utc)
 
-                    if headline:
-                        warning_text = (f'{headline}   {description}   Protective Actions: {instruction}')
-                    else:
-                        warning_text = (f'{description}   Protective Actions: {instruction}')
+                        if headline:
+                            warning_text = (f'{headline}   {description}   Protective Actions: {instruction}')
+                        else:
+                            warning_text = (f'{description}   Protective Actions: {instruction}')
 
-                    processing(event, warning_text)
+                        processing(event, warning_text)
+            else:
+                pass
         else:
             pass
 
@@ -167,7 +169,6 @@ def display(source):
 
     ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=True))
     time.sleep(180)
-    print('time')
     ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
 
     ws.disconnect()
