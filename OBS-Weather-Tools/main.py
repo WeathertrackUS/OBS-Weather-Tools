@@ -21,10 +21,6 @@ live_alert_stop_event = threading.Event()
 dashboard_stop_event = threading.Event()
 alert_stop_event = threading.Event()
 
-live_alerts_thread = None
-dashboard_thread = None
-alerts_thread = None
-
 live_alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
 alert_var = tkinter.BooleanVar()
@@ -76,11 +72,17 @@ def stop_dashboard():
 
 def confirm_action():
     """
-    Confirms the current action based on the state of the live alert, dashboard, and alert variables.
+    Confirms the current action based on the state of the live alert, 
+    dashboard, and alert variables.
 
-    It checks the state of the live alert variable and starts or stops the live alerts thread accordingly.
-    It also checks the state of the dashboard variable and starts or stops the dashboard thread.
-    Finally, it checks the state of the alert variable and starts or stops the alerts thread.
+    It checks the state of the live alert variable 
+    and starts or stops the live alerts thread accordingly.
+
+    It also checks the state of the dashboard variable 
+    and starts or stops the dashboard thread.
+
+    Finally, it checks the state of the alert variable 
+    and starts or stops the alerts thread.
 
     Parameters:
         None

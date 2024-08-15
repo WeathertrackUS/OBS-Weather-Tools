@@ -105,12 +105,12 @@ for filename, content in warning_count_files.items():
 def close_program():
     """
     Closes the program immediately using os._exit(0).
-    
+
     Parameters:
-    None
-    
+        None
+
     Returns:
-    None
+        None
     """
     os._exit(0)
 
@@ -311,7 +311,7 @@ def warning_count(data):
             warnings_file_path = os.path.join('files/warnings', 'FFE.txt')
             write_to_file(warnings_file_path, f'Flash Flood Emergencies: {ffe_count}')
 
-def write_to_file(filename, content):
+def write_to_file(FILENAME, content1):
     """
     Writes content to a file.
 
@@ -322,8 +322,8 @@ def write_to_file(filename, content):
     Returns:
     None
     """
-    with open(filename, "w") as file:
-        file.write(content + "\n")
+    with open(FILENAME, "w") as file:
+        file.write(content1 + "\n")
 
 def read_from_file(filename):
     """
@@ -336,11 +336,11 @@ def read_from_file(filename):
     int: The integer read from the file. If the file does not exist or is empty, returns 0.
     """
     try:
-        with open(filename, "r") as file:
-            content = file.read().strip()
-            if content:
+        with open(filename, "r") as file1:
+            file_content = file1.read().strip()
+            if file_content:
                 # Remove any null bytes or invalid characters before converting to int
-                cleaned_content = ''.join(char for char in content if char.isprintable())
+                cleaned_content = ''.join(char for char in file_content if char.isprintable())
                 return int(cleaned_content)
             else:
                 return 0
@@ -392,10 +392,9 @@ def get_scene_and_source_info(source_name):
         source_name (str): The name of the source to retrieve information for.
 
     Returns:
-        tuple: A tuple containing the name, UUID, and scene item ID of the current scene and source if found, 
+        tuple: A tuple containing the name, UUID, and scene item ID of the current scene and source if found,
                otherwise None, None, None.
     """
-
     if not obs_socket_ip or not obs_socket_port or not obs_socket_password:
         return None, None, None
 
@@ -492,7 +491,7 @@ def fetch_alerts():
 
                 if sent_datetime != existing_sent_datetime:
                     # This is an update to an existing alert
-                    event, notification_message, area_desc, expires_datetime = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
+                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
                     display_alert(event, notification_message, area_desc)
                     database.update(identifier=identifier, sent_datetime=sent_datetime, expires_datetime=expires_datetime, properties=properties, table_name='sent_alerts')
     update_active_alerts()

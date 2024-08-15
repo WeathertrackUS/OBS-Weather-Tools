@@ -113,7 +113,7 @@ for filename, content in desc_files.items():
     with open(file_path, 'w') as file:
         file.write(content)
 
-def write_to_file(filename, content):
+def write_to_file(filename1, content2):
     """
     Writes content to a file.
 
@@ -124,24 +124,24 @@ def write_to_file(filename, content):
     Returns:
         None
     """
-    with open(filename, "w") as file:
-        file.write(content + "\n")
+    with open(filename1, "w") as file:
+        file.write(content2 + "\n")
 
-def read_from_file(filename):
+def read_from_file(FILENAME):
     """
     Reads content from a file and returns it as a string, stripping any non-printable characters.
-    
+
     Parameters:
         filename (str): The name of the file to read from.
-    
+
     Returns:
         str: The content of the file as a string if the file exists and is not empty, otherwise 0.
     """
     try:
-        with open(filename, "r") as file:
-            content = file.read().strip()
-            if content:
-                cleaned_content = ''.join(char for char in content if char.isprintable())
+        with open(FILENAME, "r") as file:
+            content1 = file.read().strip()
+            if content1:
+                cleaned_content = ''.join(char for char in content1 if char.isprintable())
                 return cleaned_content
             else:
                 return 0

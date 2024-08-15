@@ -37,8 +37,8 @@ def read_from_file(filename):
 @app.route('/')
 def index():
     """
-    This function handles the root route of the application, fetching and updating alerts, 
-    reading counts from files for various weather warnings, and rendering an HTML template 
+    This function handles the root route of the application, fetching and updating alerts,
+    reading counts from files for various weather warnings, and rendering an HTML template
     with the retrieved data.
 
     Parameters:
@@ -130,8 +130,8 @@ def fetch_and_update_alerts():
     """
     Fetches and updates alerts from the database.
 
-    This function retrieves all alerts from the 'sent_alerts' table, 
-    processes their properties, and updates the active alerts list. 
+    This function retrieves all alerts from the 'sent_alerts' table,
+    processes their properties, and updates the active alerts list.
     It also removes expired alerts from the database.
 
     Parameters:
@@ -258,8 +258,8 @@ def fetch_and_update_alerts():
 
 def clean_and_capitalize(value):
     """
-    Cleans and capitalizes a given value by removing unwanted characters and 
-    capitalizing the first letter. The function accepts a value that can be either 
+    Cleans and capitalizes a given value by removing unwanted characters and
+    capitalizing the first letter. The function accepts a value that can be either
     a string or a list of strings, and returns the cleaned and capitalized string.
 
     Parameters:
