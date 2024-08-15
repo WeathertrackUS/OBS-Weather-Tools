@@ -1,0 +1,12 @@
+requests
+pytz
+dateutil
+obsws-python
+pystray
+Pillow
+Flask
+threading
+customtkinter
+atexit
+PIL
+plyer
