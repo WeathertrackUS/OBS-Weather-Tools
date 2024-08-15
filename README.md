@@ -39,7 +39,3 @@ This will start the alert fetching and processing system. The script will run in
 - The system uses a SQLite database to store alert information
 - Alert counts are stored in text files in a 'count' directory
 - The system can be minimized to the system tray for background operation
-
-## License
-
-[Insert appropriate license information here]
