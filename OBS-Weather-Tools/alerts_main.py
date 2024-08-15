@@ -63,10 +63,10 @@ def get_scene_and_source_info(source_name):
     return None, None, None
                     
 
-if not os.path.exists("headerText"):
-    os.mkdir("headerText")
-if not os.path.exists("descText"):
-    os.mkdir("descText")
+if not os.path.exists("files/headerText"):
+    os.mkdir("files/headerText")
+if not os.path.exists("files/descText"):
+    os.mkdir("files/descText")
 
 header_files = {
     'header1Text.txt': '',
@@ -77,12 +77,12 @@ desc_files = {
 }
 
 for filename, content in header_files.items():
-    file_path = os.path.join('headerText', filename)
+    file_path = os.path.join('files/headerText', filename)
     with open(file_path, 'w') as file:
         file.write(content)
 
 for filename, content in desc_files.items():
-    file_path = os.path.join('descText', filename)
+    file_path = os.path.join('files/descText', filename)
     with open(file_path, 'w') as file:
         file.write(content)
 
@@ -150,9 +150,9 @@ def fetch_alerts(stop_event):
             pass
 
 def processing(event, warning_text):
-    write_to_file("headerText/header1Text.txt", event)
+    write_to_file("files/headerText/header1Text.txt", event)
     single_line_warning = ' '.join(warning_text.split())
-    write_to_file("descText/desc1Text.txt", f"{single_line_warning}   ")
+    write_to_file("files/descText/desc1Text.txt", f"{single_line_warning}   ")
 
     time.sleep(2)
 

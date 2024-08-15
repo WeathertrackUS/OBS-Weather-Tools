@@ -1,11 +1,4 @@
 __pycache__/
 /.venv
-/warnings
-/count
-alerts.db
-Warning Area.txt
-Warning Header.txt
-Warning Info.txt
-descText/desc1Text.txt
-headerText/header1Text.txt
+/files
 desktop.ini

@@ -41,10 +41,10 @@ obs_source_settings = {
 }'''
 
 # Create the 'warnings' directory if it doesn't exist
-if not os.path.exists('warnings'):
-    os.makedirs('warnings')
-if not os.path.exists('count'):
-    os.makedirs('count')
+if not os.path.exists('files/warnings'):
+    os.makedirs('files/warnings')
+if not os.path.exists('files/count'):
+    os.makedirs('files/count')
 
 # Initialize the warning files with their names and 0
 warning_files = {
@@ -97,13 +97,13 @@ warning_count_files = {
 
 # Create the warning files with their initial content
 for filename, content in warning_files.items():
-    file_path = os.path.join('warnings', filename)
+    file_path = os.path.join('files/warnings', filename)
     with open(file_path, 'w') as file:
         file.write(content)
 
 # Create the warning files with their initial content
 for filename, content in warning_count_files.items():
-    file_path = os.path.join('count', filename)
+    file_path = os.path.join('files/count', filename)
     with open(file_path, 'w') as file:
         file.write(content)
 
@@ -182,124 +182,125 @@ def warning_count(data):
                 flash_flood_warning_count += 1
 
         # Read previous counts from files
-        previous_tornado_warning_count = read_from_file(os.path.join("count", "TOR Count.txt"))
-        previous_tornado_warning_total_count = read_from_file(os.path.join("count", "TOR Total.txt"))
-        previous_torr_count = read_from_file(os.path.join("count", "TORR Count.txt"))
-        previous_pds_tor_count = read_from_file(os.path.join("count", "PDS TOR Count.txt"))
-        previous_tore_count = read_from_file(os.path.join("count", "Tore Count.txt"))
+        previous_tornado_warning_count = read_from_file(os.path.join("files/count", "TOR Count.txt"))
+        previous_tornado_warning_total_count = read_from_file(os.path.join("files/count", "TOR Total.txt"))
+        previous_torr_count = read_from_file(os.path.join("files/count", "TORR Count.txt"))
+        previous_pds_tor_count = read_from_file(os.path.join("files/count", "PDS TOR Count.txt"))
+        previous_tore_count = read_from_file(os.path.join("files/count", "Tore Count.txt"))
         
-        previous_severe_thunderstorm_warning_total_count = read_from_file(os.path.join("count", "SVR Total.txt"))
-        previous_severe_thunderstorm_warning_count = read_from_file(os.path.join("count", "SVR Count.txt"))
-        previous_considerable_svr_count = read_from_file(os.path.join("count", "SVR Considerable Count.txt"))
-        previous_destructive_svr_count = read_from_file(os.path.join("count", "SVR Destructive Count.txt"))
-        previous_tor_possible_svr_count = read_from_file(os.path.join("count", "SVR Possible Count.txt"))
+        previous_severe_thunderstorm_warning_total_count = read_from_file(os.path.join("files/count", "SVR Total.txt"))
+        previous_severe_thunderstorm_warning_count = read_from_file(os.path.join("files/count", "SVR Count.txt"))
+        previous_considerable_svr_count = read_from_file(os.path.join("files/count", "SVR Considerable Count.txt"))
+        previous_destructive_svr_count = read_from_file(os.path.join("files/count", "SVR Destructive Count.txt"))
+        previous_tor_possible_svr_count = read_from_file(os.path.join("files/count", "SVR Possible Count.txt"))
         
-        previous_tornado_watch_count = read_from_file(os.path.join("count", "TOR Watch Count.txt"))
-        previous_severe_thunderstorm_watch_count = read_from_file(os.path.join("count", "SVR Watch Count.txt"))
+        previous_tornado_watch_count = read_from_file(os.path.join("files/count", "TOR Watch Count.txt"))
+        previous_severe_thunderstorm_watch_count = read_from_file(os.path.join("files/count", "SVR Watch Count.txt"))
         
-        previous_flash_flood_warning_count = read_from_file(os.path.join("count", "FFW Count.txt"))
-        previous_flash_flood_warning_total_count = read_from_file(os.path.join("count", "FFW Total.txt"))
-        previous_considerable_ffw_count = read_from_file(os.path.join("count", "Considerable FFW Count.txt"))
-        previous_ffe_count = read_from_file(os.path.join("count", "FFE Count.txt"))
+        previous_flash_flood_warning_count = read_from_file(os.path.join("files/count", "FFW Count.txt"))
+        previous_flash_flood_warning_total_count = read_from_file(os.path.join("files/count", "FFW Total.txt"))
+        previous_considerable_ffw_count = read_from_file(os.path.join("files/count", "Considerable FFW Count.txt"))
+        previous_ffe_count = read_from_file(os.path.join("files/count", "FFE Count.txt"))
 
         # Update count files only if the count has changed
         if tornado_warning_count != previous_tornado_warning_count:
-            count_file_path = os.path.join('count', 'TOR Count.txt')
+            count_file_path = os.path.join('files/count', 'TOR Count.txt')
             write_to_file(count_file_path, str(tornado_warning_count))
-            warnings_file_path = os.path.join('warnings', 'TOR.txt')
+            warnings_file_path = os.path.join('files/warnings', 'TOR.txt')
             write_to_file(warnings_file_path, f'Active Tornado Warnings: {tornado_warning_count}')
         
         if tornado_warning_total_count != previous_tornado_warning_total_count:
-            count_file_path = os.path.join('count', 'TOR Total.txt')
+            count_file_path = os.path.join('files/count', 'TOR Total.txt')
             write_to_file(count_file_path, str(tornado_warning_total_count))
-            warnings_file_path = os.path.join('warnings', 'TOR Total.txt')
+            warnings_file_path = os.path.join('files/warnings', 'TOR Total.txt')
             write_to_file(warnings_file_path, f'Active Tornado Warnings: {tornado_warning_total_count}')
         
         if torr_count != previous_torr_count:
-            count_file_path = os.path.join('count', 'TOR Observed Count.txt')
+            count_file_path = os.path.join('files/count', 'TOR Observed Count.txt')
             write_to_file(count_file_path, str(torr_count))
-            warnings_file_path = os.path.join('warnings', 'TOR Observed.txt')
+            warnings_file_path = os.path.join('files/warnings', 'TOR Observed.txt')
             write_to_file(warnings_file_path, f'Tornado Observations: {torr_count}')
         
         if pds_tor_count != previous_pds_tor_count:
-            count_file_path = os.path.join('count', 'PDS TOR Count.txt')
+            count_file_path = os.path.join('files/count', 'PDS TOR Count.txt')
             write_to_file(count_file_path, str(pds_tor_count))
-            warnings_file_path = os.path.join('warnings', 'PDS TOR.txt')
+            warnings_file_path = os.path.join('files/warnings', 'PDS TOR.txt')
             write_to_file(warnings_file_path, f'PDS Tornado Observations: {pds_tor_count}')
         
         if tore_count != previous_tore_count:
-            count_file_path = os.path.join('count', 'TOR Emergancy Count.txt')
+            count_file_path = os.path.join('files/count', 'TOR Emergancy Count.txt')
             write_to_file(count_file_path, str(tore_count))
-            warnings_file_path = os.path.join('warnings', 'TOR Emergancy.txt')
+            warnings_file_path = os.path.join('files/warnings', 'TOR Emergancy.txt')
             write_to_file(warnings_file_path, f'Tornado Emergancy Observations: {tore_count}')
         
 
         if severe_thunderstorm_warning_count != previous_severe_thunderstorm_warning_count:
-            count_file_path = os.path.join('count', 'SVR Count.txt')
+            count_file_path = os.path.join('files/count', 'SVR Count.txt')
             write_to_file(count_file_path, str(severe_thunderstorm_warning_count))
-            warnings_file_path = os.path.join('warnings', 'SVR.txt')
+            warnings_file_path = os.path.join('files/warnings', 'SVR.txt')
             write_to_file(warnings_file_path, f'Active Severe Thunderstorm Warnings: {severe_thunderstorm_warning_count}')
 
         if severe_thunderstorm_warning_total_count != previous_severe_thunderstorm_warning_total_count:
-            count_file_path = os.path.join('count', 'SVR Total.txt')
+            count_file_path = os.path.join('files/count', 'SVR Total.txt')
             write_to_file(count_file_path, str(severe_thunderstorm_warning_total_count))
-            warnings_file_path = os.path.join('warnings', 'SVR Total.txt')
+            warnings_file_path = os.path.join('files/warnings', 'SVR Total.txt')
             write_to_file(warnings_file_path, f'Active Severe Thunderstorm Warnings: {severe_thunderstorm_warning_total_count}')
         
         if considerable_svr_count != previous_considerable_svr_count:
-            count_file_path = os.path.join('count', 'Considerable SVR Count.txt')
+            count_file_path = os.path.join('files/count', 'Considerable SVR Count.txt')
             write_to_file(count_file_path, str(considerable_svr_count))
-            warnings_file_path = os.path.join('warnings', 'Considerable SVR.txt')
+            warnings_file_path = os.path.join('files/warnings', 'Considerable SVR.txt')
             write_to_file(warnings_file_path, f'Considerable SVR Warnings: {considerable_svr_count}')
 
         if destructive_svr_count != previous_destructive_svr_count:
-            count_file_path = os.path.join('count', 'Destructive SVR Count.txt')
+            count_file_path = os.path.join('files/count', 'Destructive SVR Count.txt')
             write_to_file(count_file_path, str(destructive_svr_count))
-            warnings_file_path = os.path.join('warnings', 'Destructive SVR.txt')
+            warnings_file_path = os.path.join('files/warnings', 'Destructive SVR.txt')
             write_to_file(warnings_file_path, f'Destructive SVR Warnings: {destructive_svr_count}')
 
         if tor_possible_svr_count != previous_tor_possible_svr_count:
-            count_file_path = os.path.join('count', 'TOR SVR Count.txt')
+            count_file_path = os.path.join('files/count', 'TOR SVR Count.txt')
             write_to_file(count_file_path, str(tor_possible_svr_count))
-            warnings_file_path = os.path.join('warnings', 'TOR SVR.txt')
+            warnings_file_path = os.path.join('files/warnings', 'TOR SVR.txt')
             write_to_file(warnings_file_path, f'TOR SVR Warnings: {tor_possible_svr_count}')
 
 
         if tornado_watch_count != previous_tornado_watch_count:
-            count_file_path = os.path.join('count', 'TOR Watch Count.txt')
+            count_file_path = os.path.join('files/count', 'TOR Watch Count.txt')
             write_to_file(count_file_path, str(tornado_watch_count))
-            warnings_file_path = os.path.join('warnings', 'TOR Watch.txt')
+            warnings_file_path = os.path.join('files/warnings', 'TOR Watch.txt')
             write_to_file(warnings_file_path, f'Tornado Watches: {tornado_watch_count}')
 
         if severe_thunderstorm_watch_count != previous_severe_thunderstorm_watch_count:
-            count_file_path = os.path.join('count', 'SVR Watch Count.txt')
+            count_file_path = os.path.join('files/count', 'SVR Watch Count.txt')
             write_to_file(count_file_path, str(severe_thunderstorm_watch_count))
-            warnings_file_path = os.path.join('warnings', 'SVR Watch.txt')
+            warnings_file_path = os.path.join('files/warnings', 'SVR Watch.txt')
             write_to_file(warnings_file_path, f'Severe Thunderstorm Watches: {severe_thunderstorm_watch_count}')
 
 
         if flash_flood_warning_count != previous_flash_flood_warning_count:
-            count_file_path = os.path.join('count', 'FFW Count.txt')
+            count_file_path = os.path.join('files/count', 'FFW Count.txt')
             write_to_file(count_file_path, str(flash_flood_warning_count))
-            warnings_file_path = os.path.join('warnings', 'FFW.txt')
+            warnings_file_path = os.path.join('files/warnings', 'FFW.txt')
             write_to_file(warnings_file_path, f'Flash Flood Warnings: {flash_flood_warning_count}')
         
         if flash_flood_warning_total_count != previous_flash_flood_warning_total_count:
-            count_file_path = os.path.join('count', 'FFW Total.txt')
+            count_file_path = os.path.join('files/count', 'FFW Total.txt')
             write_to_file(count_file_path, str(flash_flood_warning_total_count))
-            warnings_file_path = os.path.join('warnings', 'FFW Total.txt')
+            warnings_file_path = os.path.join('files/warnings', 'FFW Total.txt')
             write_to_file(warnings_file_path, f'Flash Flood Warnings: {flash_flood_warning_total_count}')
         
         if considerable_ffw_count != previous_considerable_ffw_count:
-            count_file_path = os.path.join('count', 'Considerable FFW Count.txt')
+            count_file_path = os.path.join('files/count', 'Considerable FFW Count.txt')
             write_to_file(count_file_path, str(considerable_ffw_count))
-            warnings_file_path = os.path.join('warnings', 'Considerable FFW.txt')
+            warnings_file_path = os.path.join('files/warnings', 'Considerable FFW.txt')
             write_to_file(warnings_file_path, f'Considerable Flash Flood Warnings: {considerable_ffw_count}')
 
         if ffe_count != previous_ffe_count:
-            count_file_path = os.path.join('count', 'FFE Count.txt')
+            count_file_path = os.path.join('files/count', 'FFE Count.txt')
             write_to_file(count_file_path, str(ffe_count))
-            warnings_file_path = os.path.join('warnings', 'FFE.txt')
+            warnings_file_path = os.path.join('files/warnings', 'FFE.txt')
+            write_to_file(warnings_file_path, f'Flash Flood Emergencies: {ffe_count}')
 
 def write_to_file(filename, content):
     with open(filename, "w") as file:
@@ -446,11 +447,11 @@ def display_alert(event, notification_message, area_desc):
     print(f'{current_time} - {notification_message}, {area_desc}')
 
     # Write the headline to the Warning Header.txt file
-    write_to_file("Warning Header.txt", event)
+    write_to_file("files/Warning Header.txt", event)
 
-    write_to_file("Warning Info.txt", notification_message)
+    write_to_file("files/Warning Info.txt", notification_message)
 
-    write_to_file("Warning Area.txt", area_desc)
+    write_to_file("files/Warning Area.txt", area_desc)
     time.sleep(2)
 
     # Connect to the OBS WebSocket

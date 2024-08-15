@@ -10,7 +10,7 @@ import multiprocessing
 
 base_dir = '.'
 
-app = Flask(__name__, template_folder=os.path.join(base_dir, 'templates'))
+app = Flask(__name__, template_folder=os.path.join(base_dir, render_templates='web/templates'))
 app.config['ACTIVE_ALERTS'] = []  # Initialize the active_alerts list
 
 def read_from_file(filename):
@@ -37,16 +37,16 @@ def index():
     fetch_and_update_alerts()
     active_alerts = app.config.get('ACTIVE_ALERTS', [])
 
-    tornado_warning_total_count = read_from_file(os.path.join('count', "TOR Total.txt"))
+    tornado_warning_total_count = read_from_file(os.path.join('files/count', "TOR Total.txt"))
     
-    severe_thunderstorm_warning_total_count = read_from_file(os.path.join('count', "SVR Total.txt"))
+    severe_thunderstorm_warning_total_count = read_from_file(os.path.join('files/count', "SVR Total.txt"))
     
-    tornado_watch_count = read_from_file(os.path.join('count', "TOR Watch.txt"))
-    severe_thunderstorm_watch_count = read_from_file(os.path.join('count', "SVR Watch.txt"))
+    tornado_watch_count = read_from_file(os.path.join('files/count', "TOR Watch.txt"))
+    severe_thunderstorm_watch_count = read_from_file(os.path.join('files/count', "SVR Watch.txt"))
     
-    flash_flood_warning_total_count = read_from_file(os.path.join('count', "FFW Total.txt"))
+    flash_flood_warning_total_count = read_from_file(os.path.join('files/count', "FFW Total.txt"))
 
-    special_weather_statement_count = read_from_file(os.path.join('count', "SPS.txt"))
+    special_weather_statement_count = read_from_file(os.path.join('files/count', "SPS.txt"))
 
     return render_template('index.html', active_alerts=active_alerts,
                            tornado_warning_total_count=tornado_warning_total_count,

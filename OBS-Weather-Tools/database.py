@@ -5,7 +5,7 @@ from dateutil import parser
 import pytz
 
 def create_table(table_name, values):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name}
                  {values}''')
@@ -13,7 +13,7 @@ def create_table(table_name, values):
     conn.close()
 
 def insert(identifier, table_name, sent_datetime=None, expires_datetime=None, properties=None, description=None, instruction=None, event=None, **kwargs):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
 
     columns = ['id']
@@ -56,7 +56,7 @@ def insert(identifier, table_name, sent_datetime=None, expires_datetime=None, pr
     conn.close()
 
 def get_alert(identifier, table_name):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"SELECT * FROM {table_name} WHERE id = ?", (identifier,))
     alert = c.fetchone()
@@ -64,7 +64,7 @@ def get_alert(identifier, table_name):
     return alert
 
 def get_all_alerts(table_name):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"SELECT * FROM {table_name}")
     alerts = c.fetchall()
@@ -72,14 +72,14 @@ def get_all_alerts(table_name):
     return alerts
 
 def remove_alert(identifier, table_name):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"DELETE FROM {table_name} WHERE id = ?", (identifier,))
     conn.commit()
     conn.close()
 
 def alert_exists(identifier, table_name):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"SELECT COUNT(*) FROM {table_name} WHERE id = ?", (identifier,))
     count = c.fetchone()[0]
@@ -87,7 +87,7 @@ def alert_exists(identifier, table_name):
     return count > 0
 
 def update(identifier, table_name, **kwargs):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     
     set_clauses = []
@@ -107,7 +107,7 @@ def update(identifier, table_name, **kwargs):
     conn.close()
 
 def clear_database(table_name):
-    conn = sqlite3.connect('alerts.db')
+    conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f'DELETE FROM {table_name}')
     conn.commit()
