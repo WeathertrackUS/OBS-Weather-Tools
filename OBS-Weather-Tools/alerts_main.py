@@ -128,8 +128,8 @@ def write_to_file(filename1, content2):
     Returns:
         None
     """
-    with open(filename1, "w") as file:
-        file.write(content2 + "\n")
+    with open(filename1, "w") as file2:
+        file2.write(content2 + "\n")
 
 
 def read_from_file(FILENAME):
@@ -143,8 +143,8 @@ def read_from_file(FILENAME):
         str: The content of the file as a string if the file exists and is not empty, otherwise 0.
     """
     try:
-        with open(FILENAME, "r") as file:
-            content1 = file.read().strip()
+        with open(FILENAME, "r") as file1:
+            content1 = file1.read().strip()
             if content1:
                 cleaned_content = ''.join(char for char in content1 if char.isprintable())
                 return cleaned_content

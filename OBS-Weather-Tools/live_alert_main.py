@@ -480,8 +480,7 @@ def fetch_alerts():
 
             if not database.alert_exists(identifier, 'sent_alerts'):
                 # This is a new alert
-                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties,
-                                                                                                                             sent_datetime, area_desc)
+                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)  # skipcq: FLK-E501
                 display_alert(event, notification_message, area_desc)
                 database.insert(identifier=identifier, sent_datetime=sent_datetime,
                                 expires_datetime=expires_datetime, properties=properties,
@@ -498,8 +497,7 @@ def fetch_alerts():
 
                 if sent_datetime != existing_sent_datetime:
                     # This is an update to an existing alert
-                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties,
-                                                                                                                                 sent_datetime, area_desc)
+                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)  # skipcq: FLK-E501
                     display_alert(event, notification_message, area_desc)
                     database.update(identifier=identifier, sent_datetime=sent_datetime,
                                     expires_datetime=expires_datetime, properties=properties,
