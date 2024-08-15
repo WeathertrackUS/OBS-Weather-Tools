@@ -5,7 +5,6 @@ from live_alert_dashboard import dashboard_kickstart
 import tkinter
 import customtkinter as ctk
 import threading
-import multiprocessing
 import alerts_main
 
 ctk.set_appearance_mode("System")
@@ -31,6 +30,15 @@ dashboard_var = tkinter.BooleanVar()
 alert_var = tkinter.BooleanVar()
 
 def update_dashboard_state(*args):
+    """
+    Updates the state of the dashboard checkbox based on the value of the live_alert_var.
+
+    Parameters:
+        *args: Variable length argument list.
+
+    Returns:
+        None
+    """
     if live_alert_var.get():
         dashboard_checkbox.configure(state="normal")
     else:
@@ -38,17 +46,48 @@ def update_dashboard_state(*args):
         dashboard_var.set(False)
 
 def start_dashboard():
+    """
+    Starts the dashboard thread if it is not already running.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     global dashboard_thread
     if dashboard_thread is None or not dashboard_thread.is_alive():
         dashboard_thread = threading.Thread(target=dashboard_kickstart, args=(dashboard_stop_event,))
         dashboard_thread.start()
 
 def stop_dashboard():
+    """
+    Stops the dashboard thread if it is currently running.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     global dashboard_thread
     if dashboard_thread and dashboard_thread.is_alive():
         dashboard_thread._stop()
 
 def confirm_action():
+    """
+    Confirms the current action based on the state of the live alert, dashboard, and alert variables.
+
+    It checks the state of the live alert variable and starts or stops the live alerts thread accordingly.
+    It also checks the state of the dashboard variable and starts or stops the dashboard thread.
+    Finally, it checks the state of the alert variable and starts or stops the alerts thread.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     global alerts_thread
 
     if live_alert_var.get():

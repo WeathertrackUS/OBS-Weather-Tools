@@ -5,8 +5,6 @@ import database
 from datetime import datetime, timezone, timedelta
 import os
 import re
-import pytz
-import multiprocessing
 
 base_dir = '.'
 
@@ -15,9 +13,16 @@ app.config['ACTIVE_ALERTS'] = []  # Initialize the active_alerts list
 
 def read_from_file(filename):
     """
-    Read an integer from a file. If the file exists and contains an integer, return that integer. If the file does not exist or is empty, return 0.
-    @param filename - the name of the file to read from
-    @return the integer read from the file or 0 if file not found or empty
+    Read an integer from a file.
+
+    If the file exists and contains an integer, return that integer.
+    If the file does not exist or is empty, return 0.
+
+    Parameters:
+        filename (str): The name of the file to read from.
+
+    Returns:
+        int: The integer read from the file or 0 if file not found or empty.
     """
     try:
         with open(filename, "r") as file:
@@ -32,7 +37,15 @@ def read_from_file(filename):
 @app.route('/')
 def index():
     """
-    This function fetches and updates alerts, reads counts from files for various weather warnings, and renders an HTML template with the retrieved data. @return: None
+    This function handles the root route of the application, fetching and updating alerts, 
+    reading counts from files for various weather warnings, and rendering an HTML template 
+    with the retrieved data.
+
+    Parameters:
+        None
+
+    Returns:
+        A rendered HTML template with the retrieved data.
     """
     fetch_and_update_alerts()
     active_alerts = app.config.get('ACTIVE_ALERTS', [])
@@ -71,18 +84,26 @@ ALERT_PRIORITY = OrderedDict([
 
 def sort_alerts(alerts):
     """
-    Sort a list of alerts based on their priority defined in the ALERT_PRIORITY dictionary.
-    @param alerts - List of alerts to be sorted
-    @return List of alerts sorted by priority
+    Sorts a list of alerts based on their priority defined in the ALERT_PRIORITY dictionary.
+
+    Parameters:
+        alerts (list): A list of alerts to be sorted.
+
+    Returns:
+        list: A list of alerts sorted by priority.
     """
     sorted_alerts = sorted(alerts, key=lambda x: ALERT_PRIORITY.get(x['event'], float('inf')))
     return sorted_alerts
 
 def get_timezone_keyword(offset):
     """
-    Given a time offset, return the corresponding timezone keyword.
-    @param offset - the time offset
-    @return the timezone keyword or the offset as a string if no match is found.
+    Returns the timezone keyword corresponding to the given offset.
+
+    Parameters:
+        offset (timedelta): The time offset for which to retrieve the timezone keyword.
+
+    Returns:
+        str: The timezone keyword if the offset is found in the mapping, otherwise the offset representation as a string.
     """
     # Define a mapping of offsets to timezone keywords
     offset_to_keyword = {
@@ -107,8 +128,17 @@ def get_timezone_keyword(offset):
 
 def fetch_and_update_alerts():
     """
-    Fetches and updates active alerts based on the current time and alert expiration time.
-    @return None
+    Fetches and updates alerts from the database.
+
+    This function retrieves all alerts from the 'sent_alerts' table, 
+    processes their properties, and updates the active alerts list. 
+    It also removes expired alerts from the database.
+
+    Parameters:
+        None
+
+    Returns:
+        None
     """
     active_alerts = []
     alerts = database.get_all_alerts(table_name="sent_alerts")
@@ -228,9 +258,15 @@ def fetch_and_update_alerts():
 
 def clean_and_capitalize(value):
     """
-    Clean and capitalize a given value, removing unwanted characters and capitalizing the first letter.
-    @param value - The value to be cleaned and capitalized
-    @return The cleaned and capitalized string
+    Cleans and capitalizes a given value by removing unwanted characters and 
+    capitalizing the first letter. The function accepts a value that can be either 
+    a string or a list of strings, and returns the cleaned and capitalized string.
+
+    Parameters:
+        value (str or list): The value to be cleaned and capitalized
+
+    Returns:
+        str: The cleaned and capitalized string
     """
     if isinstance(value, list):
         # If the value is a list, join its elements into a string
@@ -246,6 +282,15 @@ def clean_and_capitalize(value):
     return cleaned_string.capitalize()
 
 def clean_string(value):
+    """
+    Cleans a given value by converting it to a string and removing unwanted characters.
+
+    Parameters:
+    value (list or str): The value to be cleaned. It can be either a list or a string.
+
+    Returns:
+    str: The cleaned string. If the input value is empty, an empty string is returned.
+    """
     if isinstance(value, list):
         # If the value is a list, join its elements into a string
         string = ''.join(str(item) for item in value)
@@ -260,9 +305,29 @@ def clean_string(value):
     return cleaned_string
 
 def update_active_alerts():
+    """
+    Updates the list of active alerts by fetching and updating the alerts based on the current time and alert expiration time.
+
+    This function calls fetch_and_update_alerts to refresh the active alerts.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     with app.app_context():
         fetch_and_update_alerts()
 
 def dashboard_kickstart(stop_event):
+    """
+    Starts the dashboard application and runs it indefinitely until the stop event is triggered.
+
+    Parameters:
+        stop_event (threading.Event): An event object used to signal the function to stop its execution.
+
+    Returns:
+        None
+    """
     while not stop_event.is_set():
         app.run(debug=False, host='localhost', port=5000)

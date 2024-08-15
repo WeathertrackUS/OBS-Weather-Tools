@@ -1,10 +1,25 @@
 # alerts.py
-import database
-from datetime import datetime, timedelta
+from datetime import datetime
 
 MAX_MESSAGE_LENGTH = 256
 
 def process_alert(identifier, properties, sent_datetime, area_desc):
+    """
+    Process a weather alert and extract relevant information.
+
+    Parameters:
+    identifier (str): Unique identifier for the alert.
+    properties (dict): Dictionary containing alert properties.
+    sent_datetime (datetime): Date and time the alert was sent.
+    area_desc (str): Description of the affected area.
+
+    Returns:
+    event (str): Type of weather event.
+    notification_message (str): Formatted message for notification.
+    area_desc (str): Description of the affected area.
+    expires_datetime (datetime): Date and time the alert expires.
+    description (str): Detailed description of the alert.
+    """
     headline = properties["headline"]
     description = ''
     event = properties["event"]

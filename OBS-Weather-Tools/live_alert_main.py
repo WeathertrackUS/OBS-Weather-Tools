@@ -1,18 +1,13 @@
 import requests
-import json
 from plyer import notification
 import time
 from obswebsocket import obsws, requests as obs_requests
 import os
-import pystray
-from PIL import Image
-import threading
-from datetime import datetime, timezone
+from datetime import datetime
 import live_alerts_processing
 import database
 from dateutil import parser, tz
 import atexit
-from apscheduler.schedulers.background import BackgroundScheduler
 from live_alert_dashboard import app, update_active_alerts
 import pytz
 
@@ -108,16 +103,30 @@ for filename, content in warning_count_files.items():
         file.write(content)
 
 def close_program():
+    """
+    Closes the program immediately using os._exit(0).
+    
+    Parameters:
+    None
+    
+    Returns:
+    None
+    """
     os._exit(0)
 
-def hide_to_system_tray():
-        global icon
-        image = Image.open('My_project.png')
-        menu = (pystray.MenuItem("Exit", close_program),)
-        icon = pystray.Icon("name", image, "My System Tray Icon", menu)
-        icon.run()
-
 def warning_count(data):
+    """
+    This function processes weather alert data and updates count files accordingly.
+
+    It iterates through each alert in the provided data, checks the event type, and updates the corresponding count variables.
+    The function also reads previous counts from files, compares them with the current counts, and updates the files only if the counts have changed.
+
+    Parameters:
+        data (dict): A dictionary containing weather alert data.
+
+    Returns:
+        None
+    """
     tornado_warning_total_count = 0
     tornado_warning_count = 0
     torr_count = 0
@@ -303,10 +312,29 @@ def warning_count(data):
             write_to_file(warnings_file_path, f'Flash Flood Emergencies: {ffe_count}')
 
 def write_to_file(filename, content):
+    """
+    Writes content to a file.
+
+    Parameters:
+    filename (str): The name of the file to write to.
+    content (str): The content to write to the file.
+
+    Returns:
+    None
+    """
     with open(filename, "w") as file:
         file.write(content + "\n")
 
 def read_from_file(filename):
+    """
+    Reads an integer from a file.
+
+    Parameters:
+    filename (str): The name of the file to read from.
+
+    Returns:
+    int: The integer read from the file. If the file does not exist or is empty, returns 0.
+    """
     try:
         with open(filename, "r") as file:
             content = file.read().strip()
@@ -320,6 +348,12 @@ def read_from_file(filename):
         return 0
 
 def get_current_scene():
+    """
+    Retrieves the current scene from the OBS WebSocket.
+
+    Returns:
+        tuple: A tuple containing the name and scene UUID of the current scene.
+    """
     # Connect to the OBS WebSocket
     ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
     ws.connect()
@@ -328,6 +362,17 @@ def get_current_scene():
     return current_scene.get("name"), current_scene.get("sceneUuid")
 
 def get_source_id(source_name, scene_name, scene_uuid):
+    """
+    Retrieves the source ID of a specific source in a given scene.
+
+    Parameters:
+        source_name (str): The name of the source to retrieve the ID for.
+        scene_name (str): The name of the scene to search for the source in.
+        scene_uuid (str): The UUID of the scene to search for the source in.
+
+    Returns:
+        str: The source ID of the specified source, or None if not found.
+    """
     # Connect to the OBS WebSocket
     ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
     ws.connect()
@@ -340,6 +385,16 @@ def get_source_id(source_name, scene_name, scene_uuid):
     return None
 
 def get_scene_and_source_info(source_name):
+    """
+    Retrieves the scene and source information for a given source name from the OBS WebSocket.
+
+    Args:
+        source_name (str): The name of the source to retrieve information for.
+
+    Returns:
+        tuple: A tuple containing the name, UUID, and scene item ID of the current scene and source if found, 
+               otherwise None, None, None.
+    """
 
     if not obs_socket_ip or not obs_socket_port or not obs_socket_password:
         return None, None, None
@@ -375,6 +430,20 @@ def get_scene_and_source_info(source_name):
     return None, None, None
 
 def fetch_alerts():
+    """
+    Fetches active weather alerts from the National Weather Service API.
+
+    This function sends a GET request to the NWS API with parameters to filter
+    the alerts by status, message type, code, region type, urgency, severity,
+    certainty, and limit. It then processes the response and updates the
+    database with new or updated alerts.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     endpoint = "https://api.weather.gov/alerts/active"
     params = {
         "status": "actual",
@@ -429,9 +498,31 @@ def fetch_alerts():
     update_active_alerts()
 
 def update_active_alerts_and_exit():
+    """
+    Updates active alerts and exits the application.
+
+    This function calls the update_active_alerts function to refresh the active alerts before exiting.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     update_active_alerts()
 
 def display_alert(event, notification_message, area_desc):
+    """
+    Displays a weather alert notification and updates the OBS scene accordingly.
+
+    Parameters:
+        event (str): The type of weather event (e.g., tornado, severe thunderstorm).
+        notification_message (str): The message to be displayed in the notification.
+        area_desc (str): The area affected by the weather event.
+
+    Returns:
+        None
+    """
     # Display Windows notification
     notification.notify(
         title=f"{event}",
@@ -469,16 +560,18 @@ def display_alert(event, notification_message, area_desc):
 
     ws.disconnect()
 
-system_thray_thread = threading.Thread(target=hide_to_system_tray)
-system_thray_thread.start()
-
-'''scheduler = BackgroundScheduler()
-scheduler.add_job(func=fetch_alerts, trigger='interval', seconds=5)
-scheduler.start()'''
-
 atexit.register(update_active_alerts_and_exit)
 
 def kickstart(stop_event):
+    """
+    Initializes the alert system by creating the necessary database table, clearing any existing data, and starting the alert fetching process.
+
+    Parameters:
+        stop_event (threading.Event): An event object used to signal the function to stop its execution.
+
+    Returns:
+        None
+    """
     while not stop_event.is_set():
         database.create_table('sent_alerts', '(id TEXT PRIMARY KEY, sent_datetime TEXT, expires_datetime TEXT, properties TEXT)')
         database.clear_database('sent_alerts')

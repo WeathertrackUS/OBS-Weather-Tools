@@ -1,18 +1,44 @@
 # database.py
 
 import sqlite3
-from dateutil import parser
 import pytz
 
 def create_table(table_name, values):
+    """
+    Creates a table in the SQLite database if it does not already exist.
+
+    Args:
+        table_name (str): The name of the table to be created.
+        values (str): A string containing the column definitions for the table.
+
+    Returns:
+        None
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name}
-                 {values}''')
+              {values}''')
     conn.commit()
     conn.close()
 
 def insert(identifier, table_name, sent_datetime=None, expires_datetime=None, properties=None, description=None, instruction=None, event=None, **kwargs):
+    """
+    Inserts or replaces a record in the specified table in the SQLite database.
+
+    Args:
+        identifier (str): The unique identifier of the record.
+        table_name (str): The name of the table to insert into.
+        sent_datetime (datetime, optional): The datetime the alert was sent. Defaults to None.
+        expires_datetime (datetime, optional): The datetime the alert expires. Defaults to None.
+        properties (dict, optional): Additional properties of the alert. Defaults to None.
+        description (str, optional): A description of the alert. Defaults to None.
+        instruction (str, optional): An instruction related to the alert. Defaults to None.
+        event (str, optional): The event associated with the alert. Defaults to None.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        None
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
 
@@ -56,6 +82,16 @@ def insert(identifier, table_name, sent_datetime=None, expires_datetime=None, pr
     conn.close()
 
 def get_alert(identifier, table_name):
+    """
+    Retrieves an alert from the database based on its identifier and table name.
+
+    Args:
+        identifier (str): The unique identifier of the alert.
+        table_name (str): The name of the table in the database where the alert is stored.
+
+    Returns:
+        tuple: The alert data as a tuple, or None if no alert is found.
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"SELECT * FROM {table_name} WHERE id = ?", (identifier,))
@@ -64,6 +100,15 @@ def get_alert(identifier, table_name):
     return alert
 
 def get_all_alerts(table_name):
+    """
+    Retrieves all alerts from the specified table in the SQLite database.
+
+    Args:
+        table_name (str): The name of the table to retrieve alerts from.
+
+    Returns:
+        list: A list of all alerts in the specified table.
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"SELECT * FROM {table_name}")
@@ -72,6 +117,16 @@ def get_all_alerts(table_name):
     return alerts
 
 def remove_alert(identifier, table_name):
+    """
+    Removes an alert from the database.
+
+    Args:
+        identifier (int): The unique identifier of the alert to be removed.
+        table_name (str): The name of the table in the database where the alert is stored.
+
+    Returns:
+        None
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"DELETE FROM {table_name} WHERE id = ?", (identifier,))
@@ -79,6 +134,16 @@ def remove_alert(identifier, table_name):
     conn.close()
 
 def alert_exists(identifier, table_name):
+    """
+    Checks if an alert exists in the database based on its identifier and table name.
+
+    Args:
+        identifier (str): The unique identifier of the alert to check for.
+        table_name (str): The name of the table in the database where the alert is stored.
+
+    Returns:
+        bool: True if the alert exists, False otherwise.
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f"SELECT COUNT(*) FROM {table_name} WHERE id = ?", (identifier,))
@@ -87,9 +152,20 @@ def alert_exists(identifier, table_name):
     return count > 0
 
 def update(identifier, table_name, **kwargs):
+    """
+    Updates an existing alert in the database.
+
+    Args:
+        identifier (int): The unique identifier of the alert to be updated.
+        table_name (str): The name of the table in the database where the alert is stored.
+        **kwargs: Additional keyword arguments to be updated in the alert.
+
+    Returns:
+        None
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
-    
+
     set_clauses = []
     values = []
     for key, value in kwargs.items():
@@ -97,7 +173,7 @@ def update(identifier, table_name, **kwargs):
             value = value.astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')
         set_clauses.append(f"{key} = ?")
         values.append(value)
-    
+
     set_clause = ', '.join(set_clauses)
     query = f"UPDATE {table_name} SET {set_clause} WHERE id = ?"
     values.append(identifier)
@@ -107,6 +183,15 @@ def update(identifier, table_name, **kwargs):
     conn.close()
 
 def clear_database(table_name):
+    """
+    Clears the specified table in the SQLite database.
+
+    Args:
+        table_name (str): The name of the table to be cleared.
+
+    Returns:
+        None
+    """
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
     c.execute(f'DELETE FROM {table_name}')
