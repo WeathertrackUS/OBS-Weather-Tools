@@ -7,9 +7,9 @@ import time
 
 
 # OBS WebSocket settings
-obs_socket_ip = "216.16.115.246"  
-obs_socket_port = 4455  
-obs_socket_password = "VJFfpubelSgccfYR" 
+obs_socket_ip = "216.16.115.246"
+obs_socket_port = 4455
+obs_socket_password = "VJFfpubelSgccfYR"
 
 # OBS Source Settings
 obs_source_settings = {

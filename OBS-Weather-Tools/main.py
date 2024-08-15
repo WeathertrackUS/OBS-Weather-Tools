@@ -76,16 +76,16 @@ def stop_dashboard():
 
 def confirm_action():
     """
-    Confirms the current action based on the state of the live alert, 
+    Confirms the current action based on the state of the live alert,
     dashboard, and alert variables.
 
-    It checks the state of the live alert variable 
+    It checks the state of the live alert variable
     and starts or stops the live alerts thread accordingly.
 
-    It also checks the state of the dashboard variable 
+    It also checks the state of the dashboard variable
     and starts or stops the dashboard thread.
 
-    Finally, it checks the state of the alert variable 
+    Finally, it checks the state of the alert variable
     and starts or stops the alerts thread.
 
     Parameters:
@@ -117,6 +117,7 @@ def confirm_action():
         alerts_thread.start()
     else:
         alert_stop_event.set()
+
 
 live_alert_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Monitor", variable=live_alert_var, command=update_dashboard_state)
 live_alert_checkbox.grid(row=0, column=0, padx=10, pady=10)

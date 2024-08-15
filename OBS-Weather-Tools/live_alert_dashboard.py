@@ -5,6 +5,7 @@ import database
 from datetime import datetime, timezone, timedelta
 import os
 import re
+from collections import OrderedDict
 
 base_dir = '.'
 
@@ -71,9 +72,6 @@ def index():
                            special_weather_statement_count=special_weather_statement_count
                            )
 
-
-from collections import OrderedDict
-
 ALERT_PRIORITY = OrderedDict([
     ('Tornado Warning', 1),
     ('Severe Thunderstorm Warning', 2),
@@ -114,20 +112,17 @@ def get_timezone_keyword(offset):
         timedelta(hours=-4): "EDT",  # Eastern Daylight Time
         timedelta(hours=-6): "MDT",  # Mountain Daylight Time
         timedelta(hours=-7): "PDT",  # Pacific Daylight Time
-        timedelta(hours=-9): "AKDT", # Alaska Daylight Time
-        timedelta(hours=-10): "HST", # Hawaii Standard Time
+        timedelta(hours=-9): "AKDT",  # Alaska Daylight Time
+        timedelta(hours=-10): "HST",  # Hawaii Standard Time
         timedelta(hours=-3): "ADT",  # Atlantic Daylight Time (Puerto Rico)
-        timedelta(hours=+10): "CHST", # Chamorro Standard Time (Guam, Northern Mariana Islands)
-        timedelta(hours=+11): "SAMT", # Samoa Standard Time (American Samoa)
-        # Add more mappings as needed
+        timedelta(hours=+10): "CHST",  # Chamorro Standard Time (Guam, Northern Mariana Islands)
+        timedelta(hours=+11): "SAMT",  # Samoa Standard Time (American Samoa)
     }
 
     timezone_keyword = offset_to_keyword.get(offset)
     if timezone_keyword is None:
-        # If the offset is not found in the mapping, return the offset representation as a string
         return str(offset)
-    else:
-        return timezone_keyword
+    return timezone_keyword
 
 
 def fetch_and_update_alerts():
@@ -183,7 +178,6 @@ def fetch_and_update_alerts():
             maxhail = clean_and_capitalize(parameters.get("maxHailSize"))
             nwsheadline = clean_string(parameters.get("NWSheadline"))
             FFdetection = clean_and_capitalize(parameters.get("flashFloodDetection"))
-
 
             description = ''
 
