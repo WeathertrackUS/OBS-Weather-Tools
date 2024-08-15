@@ -102,6 +102,7 @@ for filename, content in warning_count_files.items():
     with open(file_path, 'w') as file:
         file.write(content)
 
+
 def close_program():
     """
     Closes the program immediately using os._exit(0).
@@ -113,6 +114,7 @@ def close_program():
         None
     """
     os._exit(0)
+
 
 def warning_count(data):
     """
@@ -196,16 +198,16 @@ def warning_count(data):
         previous_torr_count = read_from_file(os.path.join("files/count", "TORR Count.txt"))
         previous_pds_tor_count = read_from_file(os.path.join("files/count", "PDS TOR Count.txt"))
         previous_tore_count = read_from_file(os.path.join("files/count", "Tore Count.txt"))
-        
+
         previous_severe_thunderstorm_warning_total_count = read_from_file(os.path.join("files/count", "SVR Total.txt"))
         previous_severe_thunderstorm_warning_count = read_from_file(os.path.join("files/count", "SVR Count.txt"))
         previous_considerable_svr_count = read_from_file(os.path.join("files/count", "SVR Considerable Count.txt"))
         previous_destructive_svr_count = read_from_file(os.path.join("files/count", "SVR Destructive Count.txt"))
         previous_tor_possible_svr_count = read_from_file(os.path.join("files/count", "SVR Possible Count.txt"))
-        
+
         previous_tornado_watch_count = read_from_file(os.path.join("files/count", "TOR Watch Count.txt"))
         previous_severe_thunderstorm_watch_count = read_from_file(os.path.join("files/count", "SVR Watch Count.txt"))
-        
+
         previous_flash_flood_warning_count = read_from_file(os.path.join("files/count", "FFW Count.txt"))
         previous_flash_flood_warning_total_count = read_from_file(os.path.join("files/count", "FFW Total.txt"))
         previous_considerable_ffw_count = read_from_file(os.path.join("files/count", "Considerable FFW Count.txt"))
@@ -217,31 +219,30 @@ def warning_count(data):
             write_to_file(count_file_path, str(tornado_warning_count))
             warnings_file_path = os.path.join('files/warnings', 'TOR.txt')
             write_to_file(warnings_file_path, f'Active Tornado Warnings: {tornado_warning_count}')
-        
+
         if tornado_warning_total_count != previous_tornado_warning_total_count:
             count_file_path = os.path.join('files/count', 'TOR Total.txt')
             write_to_file(count_file_path, str(tornado_warning_total_count))
             warnings_file_path = os.path.join('files/warnings', 'TOR Total.txt')
             write_to_file(warnings_file_path, f'Active Tornado Warnings: {tornado_warning_total_count}')
-        
+
         if torr_count != previous_torr_count:
             count_file_path = os.path.join('files/count', 'TOR Observed Count.txt')
             write_to_file(count_file_path, str(torr_count))
             warnings_file_path = os.path.join('files/warnings', 'TOR Observed.txt')
             write_to_file(warnings_file_path, f'Tornado Observations: {torr_count}')
-        
+
         if pds_tor_count != previous_pds_tor_count:
             count_file_path = os.path.join('files/count', 'PDS TOR Count.txt')
             write_to_file(count_file_path, str(pds_tor_count))
             warnings_file_path = os.path.join('files/warnings', 'PDS TOR.txt')
             write_to_file(warnings_file_path, f'PDS Tornado Observations: {pds_tor_count}')
-        
+
         if tore_count != previous_tore_count:
             count_file_path = os.path.join('files/count', 'TOR Emergancy Count.txt')
             write_to_file(count_file_path, str(tore_count))
             warnings_file_path = os.path.join('files/warnings', 'TOR Emergancy.txt')
             write_to_file(warnings_file_path, f'Tornado Emergancy Observations: {tore_count}')
-        
 
         if severe_thunderstorm_warning_count != previous_severe_thunderstorm_warning_count:
             count_file_path = os.path.join('files/count', 'SVR Count.txt')
@@ -254,7 +255,7 @@ def warning_count(data):
             write_to_file(count_file_path, str(severe_thunderstorm_warning_total_count))
             warnings_file_path = os.path.join('files/warnings', 'SVR Total.txt')
             write_to_file(warnings_file_path, f'Active Severe Thunderstorm Warnings: {severe_thunderstorm_warning_total_count}')
-        
+
         if considerable_svr_count != previous_considerable_svr_count:
             count_file_path = os.path.join('files/count', 'Considerable SVR Count.txt')
             write_to_file(count_file_path, str(considerable_svr_count))
@@ -273,7 +274,6 @@ def warning_count(data):
             warnings_file_path = os.path.join('files/warnings', 'TOR SVR.txt')
             write_to_file(warnings_file_path, f'TOR SVR Warnings: {tor_possible_svr_count}')
 
-
         if tornado_watch_count != previous_tornado_watch_count:
             count_file_path = os.path.join('files/count', 'TOR Watch Count.txt')
             write_to_file(count_file_path, str(tornado_watch_count))
@@ -286,19 +286,18 @@ def warning_count(data):
             warnings_file_path = os.path.join('files/warnings', 'SVR Watch.txt')
             write_to_file(warnings_file_path, f'Severe Thunderstorm Watches: {severe_thunderstorm_watch_count}')
 
-
         if flash_flood_warning_count != previous_flash_flood_warning_count:
             count_file_path = os.path.join('files/count', 'FFW Count.txt')
             write_to_file(count_file_path, str(flash_flood_warning_count))
             warnings_file_path = os.path.join('files/warnings', 'FFW.txt')
             write_to_file(warnings_file_path, f'Flash Flood Warnings: {flash_flood_warning_count}')
-        
+
         if flash_flood_warning_total_count != previous_flash_flood_warning_total_count:
             count_file_path = os.path.join('files/count', 'FFW Total.txt')
             write_to_file(count_file_path, str(flash_flood_warning_total_count))
             warnings_file_path = os.path.join('files/warnings', 'FFW Total.txt')
             write_to_file(warnings_file_path, f'Flash Flood Warnings: {flash_flood_warning_total_count}')
-        
+
         if considerable_ffw_count != previous_considerable_ffw_count:
             count_file_path = os.path.join('files/count', 'Considerable FFW Count.txt')
             write_to_file(count_file_path, str(considerable_ffw_count))
@@ -310,6 +309,7 @@ def warning_count(data):
             write_to_file(count_file_path, str(ffe_count))
             warnings_file_path = os.path.join('files/warnings', 'FFE.txt')
             write_to_file(warnings_file_path, f'Flash Flood Emergencies: {ffe_count}')
+
 
 def write_to_file(FILENAME, content1):
     """
@@ -324,6 +324,7 @@ def write_to_file(FILENAME, content1):
     """
     with open(FILENAME, "w") as file:
         file.write(content1 + "\n")
+
 
 def read_from_file(filename):
     """
@@ -342,10 +343,10 @@ def read_from_file(filename):
                 # Remove any null bytes or invalid characters before converting to int
                 cleaned_content = ''.join(char for char in file_content if char.isprintable())
                 return int(cleaned_content)
-            else:
-                return 0
+            return 0
     except (FileNotFoundError, ValueError):
         return 0
+
 
 def get_current_scene():
     """
@@ -360,6 +361,7 @@ def get_current_scene():
     current_scene = ws.call(obs_requests.GetCurrentProgramScene())
     ws.disconnect()
     return current_scene.get("name"), current_scene.get("sceneUuid")
+
 
 def get_source_id(source_name, scene_name, scene_uuid):
     """
@@ -383,6 +385,7 @@ def get_source_id(source_name, scene_name, scene_uuid):
             return item["sourceItemId"]
     ws.disconnect()
     return None
+
 
 def get_scene_and_source_info(source_name):
     """
@@ -427,6 +430,7 @@ def get_scene_and_source_info(source_name):
         pass
 
     return None, None, None
+
 
 def fetch_alerts():
     """
@@ -476,9 +480,12 @@ def fetch_alerts():
 
             if not database.alert_exists(identifier, 'sent_alerts'):
                 # This is a new alert
-                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
+                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties,
+                                                                                                                             sent_datetime, area_desc)
                 display_alert(event, notification_message, area_desc)
-                database.insert(identifier=identifier, sent_datetime=sent_datetime, expires_datetime=expires_datetime, properties=properties, table_name='sent_alerts')
+                database.insert(identifier=identifier, sent_datetime=sent_datetime,
+                                expires_datetime=expires_datetime, properties=properties,
+                                table_name='sent_alerts')
             else:
                 existing_alert = database.get_alert(identifier, 'sent_alerts')
                 existing_sent_datetime_str = existing_alert[1]
@@ -491,10 +498,14 @@ def fetch_alerts():
 
                 if sent_datetime != existing_sent_datetime:
                     # This is an update to an existing alert
-                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)
+                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties,
+                                                                                                                                 sent_datetime, area_desc)
                     display_alert(event, notification_message, area_desc)
-                    database.update(identifier=identifier, sent_datetime=sent_datetime, expires_datetime=expires_datetime, properties=properties, table_name='sent_alerts')
+                    database.update(identifier=identifier, sent_datetime=sent_datetime,
+                                    expires_datetime=expires_datetime, properties=properties,
+                                    table_name='sent_alerts')
     update_active_alerts()
+
 
 def update_active_alerts_and_exit():
     """
@@ -509,6 +520,7 @@ def update_active_alerts_and_exit():
         None
     """
     update_active_alerts()
+
 
 def display_alert(event, notification_message, area_desc):
     """
@@ -560,6 +572,7 @@ def display_alert(event, notification_message, area_desc):
     ws.disconnect()
 
 atexit.register(update_active_alerts_and_exit)
+
 
 def kickstart(stop_event):
     """

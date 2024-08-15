@@ -11,6 +11,7 @@ base_dir = '.'
 app = Flask(__name__, template_folder=os.path.join(base_dir, render_templates='web/templates'))
 app.config['ACTIVE_ALERTS'] = []  # Initialize the active_alerts list
 
+
 def read_from_file(filename):
     """
     Read an integer from a file.
@@ -29,10 +30,10 @@ def read_from_file(filename):
             content = file.read().strip()
             if content:
                 return int(content)
-            else:
-                return 0
+            return 0
     except FileNotFoundError:
         return 0
+
 
 @app.route('/')
 def index():
@@ -51,12 +52,12 @@ def index():
     active_alerts = app.config.get('ACTIVE_ALERTS', [])
 
     tornado_warning_total_count = read_from_file(os.path.join('files/count', "TOR Total.txt"))
-    
+
     severe_thunderstorm_warning_total_count = read_from_file(os.path.join('files/count', "SVR Total.txt"))
-    
+
     tornado_watch_count = read_from_file(os.path.join('files/count', "TOR Watch.txt"))
     severe_thunderstorm_watch_count = read_from_file(os.path.join('files/count', "SVR Watch.txt"))
-    
+
     flash_flood_warning_total_count = read_from_file(os.path.join('files/count', "FFW Total.txt"))
 
     special_weather_statement_count = read_from_file(os.path.join('files/count', "SPS.txt"))
@@ -69,7 +70,7 @@ def index():
                            flash_flood_warning_total_count=flash_flood_warning_total_count,
                            special_weather_statement_count=special_weather_statement_count
                            )
-    
+
 
 from collections import OrderedDict
 
@@ -81,6 +82,7 @@ ALERT_PRIORITY = OrderedDict([
     ('Severe Thunderstorm Watch', 5),
     ('Special Weather Statement', 6)
 ])
+
 
 def sort_alerts(alerts):
     """
@@ -94,6 +96,7 @@ def sort_alerts(alerts):
     """
     sorted_alerts = sorted(alerts, key=lambda x: ALERT_PRIORITY.get(x['event'], float('inf')))
     return sorted_alerts
+
 
 def get_timezone_keyword(offset):
     """
@@ -126,6 +129,7 @@ def get_timezone_keyword(offset):
     else:
         return timezone_keyword
 
+
 def fetch_and_update_alerts():
     """
     Fetches and updates alerts from the database.
@@ -145,7 +149,7 @@ def fetch_and_update_alerts():
     current_time = datetime.now(timezone.utc)
     for alert in alerts:
         identifier, sent_datetime_str, expires_datetime_str, properties_str = alert
-        
+
         sent_datetime = datetime.strptime(sent_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
         expires_datetime = datetime.strptime(expires_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
         properties = eval(properties_str)  # Convert the string back to a dictionary
@@ -224,7 +228,7 @@ def fetch_and_update_alerts():
                     description += f", Max Wind: {(maxwind)}"
                 else:
                     description += f"Max Wind: {(maxwind)}"
-            
+
             if maxhail != 'None':
                 if description != '':
                     description += f", Max Hail: {(maxhail)}"
@@ -256,6 +260,7 @@ def fetch_and_update_alerts():
     with app.app_context():
         app.config['ACTIVE_ALERTS'] = sorted_alerts
 
+
 def clean_and_capitalize(value):
     """
     Cleans and capitalizes a given value by removing unwanted characters and
@@ -281,6 +286,7 @@ def clean_and_capitalize(value):
     cleaned_string = re.sub(r'[\[\]\'\"]', '', string)
     return cleaned_string.capitalize()
 
+
 def clean_string(value):
     """
     Cleans a given value by converting it to a string and removing unwanted characters.
@@ -304,6 +310,7 @@ def clean_string(value):
     cleaned_string = re.sub(r'[\[\]\'\"]', '', string)
     return cleaned_string
 
+
 def update_active_alerts():
     """
     Updates the list of active alerts by fetching and updating the alerts based on the current time and alert expiration time.
@@ -318,6 +325,7 @@ def update_active_alerts():
     """
     with app.app_context():
         fetch_and_update_alerts()
+
 
 def dashboard_kickstart(stop_event):
     """

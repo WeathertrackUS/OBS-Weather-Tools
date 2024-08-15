@@ -3,6 +3,7 @@ from datetime import datetime
 
 MAX_MESSAGE_LENGTH = 256
 
+
 def process_alert(identifier, properties, sent_datetime, area_desc):
     """
     Process a weather alert and extract relevant information.

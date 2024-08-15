@@ -16,6 +16,7 @@ obs_source_settings = {
     "Warning Feed": "Warning-Feed"
 }
 
+
 def get_current_scene():
     """
     Retrieves the current scene from the OBS WebSocket.
@@ -28,6 +29,7 @@ def get_current_scene():
     current_scene = ws.call(obs_requests.GetCurrentProgramScene())
     ws.disconnect()
     return current_scene.get("name"), current_scene.get("sceneUuid")
+
 
 def get_source_id(source_name, scene_name, scene_uuid):
     """
@@ -50,6 +52,7 @@ def get_source_id(source_name, scene_name, scene_uuid):
             return item["sourceItemId"]
     ws.disconnect()
     return None
+
 
 def get_scene_and_source_info(source_name):
     """
@@ -88,7 +91,7 @@ def get_scene_and_source_info(source_name):
         pass
 
     return None, None, None
-                    
+
 
 if not os.path.exists("files/headerText"):
     os.mkdir("files/headerText")
@@ -113,6 +116,7 @@ for filename, content in desc_files.items():
     with open(file_path, 'w') as file:
         file.write(content)
 
+
 def write_to_file(filename1, content2):
     """
     Writes content to a file.
@@ -126,6 +130,7 @@ def write_to_file(filename1, content2):
     """
     with open(filename1, "w") as file:
         file.write(content2 + "\n")
+
 
 def read_from_file(FILENAME):
     """
@@ -143,9 +148,8 @@ def read_from_file(FILENAME):
             if content1:
                 cleaned_content = ''.join(char for char in content1 if char.isprintable())
                 return cleaned_content
-            else:
-                return 0
-    except(FileNotFoundError, ValueError):
+            return 0
+    except (FileNotFoundError, ValueError):
         return 0
 
 
@@ -162,6 +166,7 @@ params = {
 }
 
 response = requests.get(endpoint, params=params)
+
 
 def fetch_alerts(stop_event):
     """
@@ -199,15 +204,16 @@ def fetch_alerts(stop_event):
                         sent_datetime = parser.parse(sent).astimezone(pytz.utc)
 
                         if headline:
-                            warning_text = (f'{headline}   {description}   Protective Actions: {instruction}')
+                            warning_text = f'{headline}   {description}   Protective Actions: {instruction}'
                         else:
-                            warning_text = (f'{description}   Protective Actions: {instruction}')
+                            warning_text = f'{description}   Protective Actions: {instruction}'
 
                         processing(event, warning_text)
             else:
                 pass
         else:
             pass
+
 
 def processing(event, warning_text):
     """
@@ -227,7 +233,6 @@ def processing(event, warning_text):
     time.sleep(2)
 
     display("Warning Feed")
-
 
 
 def display(source):
@@ -251,6 +256,7 @@ def display(source):
     ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
 
     ws.disconnect()
+
 
 def kickstart(stop_event):
     """

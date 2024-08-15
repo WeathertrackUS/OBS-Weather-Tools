@@ -3,6 +3,7 @@
 import sqlite3
 import pytz
 
+
 def create_table(table_name, values):
     """
     Creates a table in the SQLite database if it does not already exist.
@@ -21,7 +22,9 @@ def create_table(table_name, values):
     conn.commit()
     conn.close()
 
-def insert(identifier, table_name, sent_datetime=None, expires_datetime=None, properties=None, description=None, instruction=None, event=None, **kwargs):
+
+def insert(identifier, table_name, sent_datetime=None, expires_datetime=None,
+           properties=None, description=None, instruction=None, event=None, **kwargs):
     """
     Inserts or replaces a record in the specified table in the SQLite database.
 
@@ -81,6 +84,7 @@ def insert(identifier, table_name, sent_datetime=None, expires_datetime=None, pr
     conn.commit()
     conn.close()
 
+
 def get_alert(identifier, table_name):
     """
     Retrieves an alert from the database based on its identifier and table name.
@@ -99,6 +103,7 @@ def get_alert(identifier, table_name):
     conn.close()
     return alert
 
+
 def get_all_alerts(table_name):
     """
     Retrieves all alerts from the specified table in the SQLite database.
@@ -115,6 +120,7 @@ def get_all_alerts(table_name):
     alerts = c.fetchall()
     conn.close()
     return alerts
+
 
 def remove_alert(identifier, table_name):
     """
@@ -133,6 +139,7 @@ def remove_alert(identifier, table_name):
     conn.commit()
     conn.close()
 
+
 def alert_exists(identifier, table_name):
     """
     Checks if an alert exists in the database based on its identifier and table name.
@@ -150,6 +157,7 @@ def alert_exists(identifier, table_name):
     count = c.fetchone()[0]
     conn.close()
     return count > 0
+
 
 def update(identifier, table_name, **kwargs):
     """
@@ -177,10 +185,11 @@ def update(identifier, table_name, **kwargs):
     set_clause = ', '.join(set_clauses)
     query = f"UPDATE {table_name} SET {set_clause} WHERE id = ?"
     values.append(identifier)
-    
+
     c.execute(query, tuple(values))
     conn.commit()
     conn.close()
+
 
 def clear_database(table_name):
     """

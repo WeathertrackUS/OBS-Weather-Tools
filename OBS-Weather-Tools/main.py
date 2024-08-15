@@ -25,6 +25,7 @@ live_alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
 alert_var = tkinter.BooleanVar()
 
+
 def update_dashboard_state(*args):
     """
     Updates the state of the dashboard checkbox based on the value of the live_alert_var.
@@ -41,6 +42,7 @@ def update_dashboard_state(*args):
         dashboard_checkbox.configure(state="disabled")
         dashboard_var.set(False)
 
+
 def start_dashboard():
     """
     Starts the dashboard thread if it is not already running.
@@ -56,6 +58,7 @@ def start_dashboard():
         dashboard_thread = threading.Thread(target=dashboard_kickstart, args=(dashboard_stop_event,))
         dashboard_thread.start()
 
+
 def stop_dashboard():
     """
     Stops the dashboard thread if it is currently running.
@@ -69,6 +72,7 @@ def stop_dashboard():
     global dashboard_thread
     if dashboard_thread and dashboard_thread.is_alive():
         dashboard_thread._stop()
+
 
 def confirm_action():
     """
