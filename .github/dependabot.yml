@@ -11,3 +11,7 @@ updates:
       interval: "daily"
     reviewers:
       - "WxboySuper"
+    groups:
+      python-packages:
+        patterns:
+          - "*"
