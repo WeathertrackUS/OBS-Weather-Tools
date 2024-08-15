@@ -72,6 +72,7 @@ def index():
                            special_weather_statement_count=special_weather_statement_count
                            )
 
+
 ALERT_PRIORITY = OrderedDict([
     ('Tornado Warning', 1),
     ('Severe Thunderstorm Warning', 2),
