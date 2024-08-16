@@ -94,7 +94,6 @@ def confirm_action():
     Returns:
         None
     """
-
     if live_alert_var.get():
         if not alerts_thread or not alerts_thread.is_alive():  # skipcq: PYL-E0601
             alert_stop_event.clear()
