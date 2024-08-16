@@ -230,4 +230,3 @@ def clear_database(table_name):
     c.execute(f'DELETE FROM {table_name}')  # skipcq: BAN-B608
     conn.commit()
     conn.close()
-
