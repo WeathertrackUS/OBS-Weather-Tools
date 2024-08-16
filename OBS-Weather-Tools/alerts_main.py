@@ -117,7 +117,7 @@ for filename, content in desc_files.items():
         file.write(content)
 
 
-def write_to_file(filename1, content2):
+def write_to_file(filename1, content2):  # skipcq: PYL-R1710
     """
     Writes content to a file.
 

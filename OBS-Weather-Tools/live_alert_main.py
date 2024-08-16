@@ -311,7 +311,7 @@ def warning_count(data):
             write_to_file(warnings_file_path, f'Flash Flood Emergencies: {ffe_count}')
 
 
-def write_to_file(FILENAME, content1):
+def write_to_file(FILENAME, content1):  # skipcq: PYL-R1710
     """
     Writes content to a file.
 
