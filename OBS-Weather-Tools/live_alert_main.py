@@ -116,7 +116,7 @@ def close_program():
     os._exit(0)
 
 
-def warning_count(data):  # skipcq: PYL-R1000
+def warning_count(data):  # skipcq: PY-R1000
     """
     This function processes weather alert data and updates count files accordingly.
 

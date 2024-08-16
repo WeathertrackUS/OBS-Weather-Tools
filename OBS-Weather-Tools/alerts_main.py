@@ -1,6 +1,4 @@
 import os
-from dateutil import parser
-import pytz
 import requests
 from obswebsocket import obsws, requests as obs_requests
 import time
@@ -202,7 +200,6 @@ def fetch_alerts(stop_event):
                         event = properties["event"]
                         description = properties["description"]
                         instruction = properties["instruction"]
-                        sent = properties["sent"]
 
                         parameters = properties["parameters"]
                         headline = parameters["NWSheadline"]
