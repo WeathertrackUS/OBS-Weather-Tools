@@ -8,7 +8,7 @@ import live_alerts_processing
 import database
 from dateutil import parser, tz
 import atexit
-from live_alert_dashboard import app, update_active_alerts
+from live_alert_dashboard import update_active_alerts
 import pytz
 
 # OBS WebSocket settings
@@ -116,7 +116,7 @@ def close_program():
     os._exit(0)
 
 
-def warning_count(data):
+def warning_count(data):  # skipcq: PYL-R1000
     """
     This function processes weather alert data and updates count files accordingly.
 
@@ -325,11 +325,11 @@ def write_to_file(FILENAME, content1):  # skipcq: PYL-R1710
     if FILENAME not in (warning_count_files, warning_files, "Warning Header.txt", "Warning Description.txt", "Warning Area.txt"):
         return "Invalid filename"
 
-    with open(FILENAME, "w") as file:
-        file.write(content1 + "\n")
+    with open(FILENAME, "w") as file2:
+        file2.write(content1 + "\n")
 
 
-def read_from_file(filename):
+def read_from_file(filename1):
     """
     Reads an integer from a file.
 
@@ -339,11 +339,11 @@ def read_from_file(filename):
     Returns:
     int: The integer read from the file. If the file does not exist or is empty, returns 0.
     """
-    if filename not in (warning_count_files, warning_files, "Warning Header.txt", "Warning Description.txt", "Warning Area.txt"):
+    if filename1 not in (warning_count_files, warning_files, "Warning Header.txt", "Warning Description.txt", "Warning Area.txt"):
         return "Invalid filename"
 
     try:
-        with open(filename, "r") as file1:
+        with open(filename1, "r") as file1:
             file_content = file1.read().strip()
             if file_content:
                 # Remove any null bytes or invalid characters before converting to int
@@ -486,7 +486,7 @@ def fetch_alerts():
 
             if not database.alert_exists(identifier, 'sent_alerts'):
                 # This is a new alert
-                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)  # skipcq: FLK-E501
+                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501  # skipcq: PYL-W0612
                 display_alert(event, notification_message, area_desc)
                 database.insert(identifier=identifier, sent_datetime=sent_datetime,
                                 expires_datetime=expires_datetime, properties=properties,
@@ -494,16 +494,13 @@ def fetch_alerts():
             else:
                 existing_alert = database.get_alert(identifier, 'sent_alerts')
                 existing_sent_datetime_str = existing_alert[1]
-                existing_expires_datetime_str = existing_alert[2]
-                existing_properties = existing_alert[3]
 
                 # Convert existing_sent_datetime and existing_expires_datetime to UTC
                 existing_sent_datetime = parser.parse(existing_sent_datetime_str).replace(tzinfo=tz.tzutc())
-                existing_expires_datetime = parser.parse(existing_expires_datetime_str).replace(tzinfo=tz.tzutc())
 
                 if sent_datetime != existing_sent_datetime:
                     # This is an update to an existing alert
-                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(identifier, properties, sent_datetime, area_desc)  # skipcq: FLK-E501
+                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501
                     display_alert(event, notification_message, area_desc)
                     database.update(identifier=identifier, sent_datetime=sent_datetime,
                                     expires_datetime=expires_datetime, properties=properties,

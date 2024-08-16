@@ -130,7 +130,7 @@ def get_timezone_keyword(offset):
     return timezone_keyword
 
 
-def fetch_and_update_alerts():
+def fetch_and_update_alerts():  # skipcq: PYL-R1000
     """
     Fetches and updates alerts from the database.
 
@@ -150,7 +150,6 @@ def fetch_and_update_alerts():
     for alert in alerts:
         identifier, sent_datetime_str, expires_datetime_str, properties_str = alert
 
-        sent_datetime = datetime.strptime(sent_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
         expires_datetime = datetime.strptime(expires_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
         properties = ast.literal_eval(properties_str)  # Convert the string back to a dictionary
 
@@ -174,7 +173,6 @@ def fetch_and_update_alerts():
 
         if expires_datetime > current_time:
             event = properties["event"]
-            headline = properties["headline"]
             messagetype = properties["messageType"]
             wfo = properties["senderName"]
 
@@ -188,7 +186,7 @@ def fetch_and_update_alerts():
 
             if messagetype == 'Update':
                 if description != '':
-                    description += f", UPDATE"
+                    description += ", UPDATE"
                 else:
                     description += "UPDATE"
 

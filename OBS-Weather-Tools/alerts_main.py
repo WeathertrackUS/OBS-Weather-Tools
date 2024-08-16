@@ -207,8 +207,6 @@ def fetch_alerts(stop_event):
                         parameters = properties["parameters"]
                         headline = parameters["NWSheadline"]
 
-                        sent_datetime = parser.parse(sent).astimezone(pytz.utc)
-
                         if headline:
                             warning_text = f'{headline}   {description}   Protective Actions: {instruction}'
                         else:
