@@ -53,7 +53,7 @@ def start_dashboard():
     Returns:
         None
     """
-    global dashboard_thread  # skipcq: PYL-W0601
+    global dashboard_thread  # skipcq: PYL-W0602
     if dashboard_thread is None or not dashboard_thread.is_alive():
         dashboard_thread = threading.Thread(target=dashboard_kickstart, args=(dashboard_stop_event,))
         dashboard_thread.start()
