@@ -53,7 +53,7 @@ def start_dashboard():
     Returns:
         None
     """
-    global dashboard_thread
+    global dashboard_thread  # skipcq: PYL-W0601
     if dashboard_thread is None or not dashboard_thread.is_alive():
         dashboard_thread = threading.Thread(target=dashboard_kickstart, args=(dashboard_stop_event,))
         dashboard_thread.start()
@@ -71,7 +71,7 @@ def stop_dashboard():
     """
     global dashboard_thread
     if dashboard_thread and dashboard_thread.is_alive():
-        dashboard_thread._stop()
+        dashboard_thread._stop()  # skipcq: PYL-W0212
 
 
 def confirm_action():
@@ -94,10 +94,9 @@ def confirm_action():
     Returns:
         None
     """
-    global alerts_thread
 
     if live_alert_var.get():
-        if not alerts_thread or not alerts_thread.is_alive():
+        if not alerts_thread or not alerts_thread.is_alive():  # skipcq: PYL-E0601
             alert_stop_event.clear()
             live_alerts_thread = threading.Thread(target=kickstart, args=(alert_stop_event,))
             live_alerts_thread.start()

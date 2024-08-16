@@ -10,7 +10,7 @@ import ast
 
 base_dir = '.'
 
-app = Flask(__name__, template_folder=os.path.join(base_dir, render_templates='web/templates'))
+app = Flask(__name__, template_folder=os.path.join(base_dir, '../web/templates'))
 app.config['ACTIVE_ALERTS'] = []  # Initialize the active_alerts list
 
 
@@ -250,7 +250,7 @@ def fetch_and_update_alerts():  # skipcq: PY-R1000
                 "area": area_desc
             })
         else:
-            database.remove_alert(identifier)
+            database.remove_alert(identifier=identifier, table_name="active_alerts")
 
     sorted_alerts = sort_alerts(active_alerts)
 

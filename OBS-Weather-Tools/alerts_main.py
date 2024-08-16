@@ -192,7 +192,7 @@ def fetch_alerts(stop_event):
             data = response.json()
             features = data["features"]
 
-            if alert in features:
+            if alert in features:  # skipcq: PYL-E0601
                 for alert in features:
                     while not stop_event.is_set():
                         properties = alert["properties"]
