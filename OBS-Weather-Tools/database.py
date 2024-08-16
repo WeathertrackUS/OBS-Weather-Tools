@@ -3,6 +3,7 @@ import sqlite3
 ALLOWED_TABLES = {'sent_alerts'}
 ALLOWED_COLUMNS = {'id', 'event', 'sent_datetime', 'expires_datetime', 'properties', 'description', 'instruction'}
 
+
 def create_table(table_name, values):
     """
     Creates a table in the SQLite database if it does not already exist.
@@ -22,13 +23,14 @@ def create_table(table_name, values):
 
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
-    
+
     c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
     if c.fetchone() is None:
         c.execute(f"CREATE TABLE {table_name} {values}")
 
     conn.commit()
     conn.close()
+
 
 def insert(identifier, table_name, **kwargs):
     """
@@ -70,6 +72,7 @@ def insert(identifier, table_name, **kwargs):
     conn.commit()
     conn.close()
 
+
 def get_alert(identifier, table_name):
     """
     Retrieves an alert from the database based on the provided identifier and table name.
@@ -89,10 +92,11 @@ def get_alert(identifier, table_name):
 
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
-    c.execute(f"SELECT * FROM {table_name} WHERE id = ?", (identifier,))
+    c.execute(f"SELECT * FROM {table_name} WHERE id = ?", (identifier,))  # skipcq: BAN-B608
     alert = c.fetchone()
     conn.close()
     return alert
+
 
 def get_all_alerts(table_name):
     """
@@ -112,10 +116,11 @@ def get_all_alerts(table_name):
 
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
-    c.execute(f"SELECT * FROM {table_name}")
+    c.execute(f"SELECT * FROM {table_name}")  # skipcq: BAN-B608
     alerts = c.fetchall()
     conn.close()
     return alerts
+
 
 def remove_alert(identifier, table_name):
     """
@@ -136,9 +141,10 @@ def remove_alert(identifier, table_name):
 
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
-    c.execute(f"DELETE FROM {table_name} WHERE id = ?", (identifier,))
+    c.execute(f"DELETE FROM {table_name} WHERE id = ?", (identifier,))  # skipcq: BAN-B608
     conn.commit()
     conn.close()
+
 
 def alert_exists(identifier, table_name):
     """
@@ -159,10 +165,11 @@ def alert_exists(identifier, table_name):
 
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
-    c.execute(f"SELECT COUNT(*) FROM {table_name} WHERE id = ?", (identifier,))
+    c.execute(f"SELECT COUNT(*) FROM {table_name} WHERE id = ?", (identifier,))  # skipcq: BAN-B608
     count = c.fetchone()[0]
     conn.close()
     return count > 0
+
 
 def update(identifier, table_name, **kwargs):
     """
@@ -197,9 +204,10 @@ def update(identifier, table_name, **kwargs):
     query = f"UPDATE {table_name} SET {set_clause} WHERE id = ?"
     values.append(identifier)
 
-    c.execute(query, tuple(values))
+    c.execute(query, tuple(values))  # skipcq: BAN-B608
     conn.commit()
     conn.close()
+
 
 def clear_database(table_name):
     """
@@ -219,6 +227,7 @@ def clear_database(table_name):
 
     conn = sqlite3.connect('files/alerts.db')
     c = conn.cursor()
-    c.execute(f'DELETE FROM {table_name}')
+    c.execute(f'DELETE FROM {table_name}')  # skipcq: BAN-B608
     conn.commit()
     conn.close()
+
