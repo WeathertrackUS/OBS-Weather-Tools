@@ -128,6 +128,9 @@ def write_to_file(filename1, content2):
     Returns:
         None
     """
+    if filename1 not in ("header1Text.txt", "desc1Text.txt"):
+        return "Invalid filename"
+
     with open(filename1, "w") as file2:
         file2.write(content2 + "\n")
 
@@ -142,6 +145,9 @@ def read_from_file(FILENAME):
     Returns:
         str: The content of the file as a string if the file exists and is not empty, otherwise 0.
     """
+    if FILENAME not in ("header1Text.txt", "desc1Text.txt"):
+        return "Invalid filename"
+
     try:
         with open(FILENAME, "r") as file1:
             content1 = file1.read().strip()

@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 import os
 import re
 from collections import OrderedDict
+import ast
 
 base_dir = '.'
 
@@ -26,6 +27,9 @@ def read_from_file(filename):
     Returns:
         int: The integer read from the file or 0 if file not found or empty.
     """
+    if filename not in ("TOR Total.txt", "SVR Total.txt", "TOR Watch.txt", "SVR Watch.txt", "FFW Total.txt", "SPS.txt"):
+        return "Invalid filename"
+
     try:
         with open(filename, "r") as file:
             content = file.read().strip()
@@ -148,7 +152,7 @@ def fetch_and_update_alerts():
 
         sent_datetime = datetime.strptime(sent_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
         expires_datetime = datetime.strptime(expires_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
-        properties = eval(properties_str)  # Convert the string back to a dictionary
+        properties = ast.literal_eval(properties_str)  # Convert the string back to a dictionary
 
         alert_endtime = properties["expires"]
         alert_endtime_tz_offset = alert_endtime[-6:]  # Extract the timezone offset from the string

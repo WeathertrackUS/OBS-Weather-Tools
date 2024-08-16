@@ -322,6 +322,9 @@ def write_to_file(FILENAME, content1):
     Returns:
     None
     """
+    if FILENAME not in (warning_count_files, warning_files, "Warning Header.txt", "Warning Description.txt", "Warning Area.txt"):
+        return "Invalid filename"
+
     with open(FILENAME, "w") as file:
         file.write(content1 + "\n")
 
@@ -336,6 +339,9 @@ def read_from_file(filename):
     Returns:
     int: The integer read from the file. If the file does not exist or is empty, returns 0.
     """
+    if filename not in (warning_count_files, warning_files, "Warning Header.txt", "Warning Description.txt", "Warning Area.txt"):
+        return "Invalid filename"
+
     try:
         with open(filename, "r") as file1:
             file_content = file1.read().strip()
