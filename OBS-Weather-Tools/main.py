@@ -69,7 +69,6 @@ def stop_dashboard():
     Returns:
         None
     """
-    global dashboard_thread
     if dashboard_thread and dashboard_thread.is_alive():
         dashboard_thread._stop()  # skipcq: PYL-W0212
 
