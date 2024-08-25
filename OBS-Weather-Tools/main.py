@@ -24,7 +24,7 @@ alert_stop_event = threading.Event()
 live_alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
 alert_var = tkinter.BooleanVar()
-spc_outlook_var = tkinter.BooleanVar ()
+spc_outlook_var = tkinter.BooleanVar()
 
 
 def update_dashboard_state(*args):
