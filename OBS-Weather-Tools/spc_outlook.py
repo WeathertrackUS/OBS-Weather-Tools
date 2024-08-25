@@ -36,6 +36,7 @@ log.basicConfig(
     filemode='w'
 )
 
+
 def check_rss_feed(url, interval):
     """
     Checks the RSS feed at the specified URL for new entries and sends a notification for each new entry.
@@ -76,7 +77,21 @@ def check_rss_feed(url, interval):
         time.sleep(interval)
         log.info('RSS - Interval Passed')
 
+
 def fetch_outlook(outlook_type):
+    """
+    Fetches a SPC Outlook based on the specified outlook type.
+
+    Parameters:
+        outlook_type (str): The type of outlook to fetch. Valid options are 'cat', 'tor', 'wind', and 'hail'.
+
+    Returns:
+        dict: The JSON data of the fetched outlook.
+
+    Raises:
+        requests.exceptions.RequestException: If the request to the URL fails.
+        ValueError: If the outlook_type is not one of the valid options.
+    """
     log.info('SPC Outlook - Fetching a SPC Outlook')
     if outlook_type == 'cat':
         url = 'https://www.spc.noaa.gov/products/outlook/day1otlk_cat.nolyr.geojson'
@@ -89,11 +104,12 @@ def fetch_outlook(outlook_type):
     else:
         log.error('SPC Outlook - Invalid Outlook Type. outlook_type = ' + outlook_type)
         popup('Invalid Outlook Type. outlook_type = ' + outlook_type)
-    
+
     response = requests.get(url)  # Requests the data from the GeoJSON URL
     response.raise_for_status()
     outlook_data = response.json()
     return outlook_data  # Returns the data from the Outlook
+
 
 def create_output_directory():
     """
@@ -110,6 +126,7 @@ def create_output_directory():
     os.makedirs(output_directory, exist_ok=True)
     return output_directory
 
+
 def setup_plot():
     """
     Sets up a plot with a specified size and aspect ratio.
@@ -124,7 +141,7 @@ def setup_plot():
     ax.set_aspect('auto', adjustable='box')
     return fig, ax  # Return the variables holding the data about the plot
 
-# Function to set the limits of the plot
+
 def set_plot_limits(ax):
     """
     Sets the x and y limits of a plot.
@@ -140,7 +157,6 @@ def set_plot_limits(ax):
     ax.set_ylim([20, 60])  # Base for y: (23, 50)
 
 
-# Function to remove all labels and axes
 def remove_axes_labels_boxes_title(ax):
     """
     Removes axes, labels, boxes, and titles from a plot.
@@ -170,7 +186,6 @@ def remove_axes_labels_boxes_title(ax):
     plt.title('')
 
 
-# Function to control the CONUS State Outlines
 def add_overlays(ax, outlook_type):
     """
     Adds overlays and shapefiles to a plot.
@@ -217,7 +232,6 @@ def add_overlays(ax, outlook_type):
     ax.add_artist(ab)
 
 
-# Function to control the basemap
 def add_basemap(ax):
     """
     Adds a basemap to a plot.
@@ -233,7 +247,6 @@ def add_basemap(ax):
     log.info('basemap loaded')
 
 
-# Function to check if there is a outlook to display
 def check_outlook_availability(outlook_data):
     """
     Checks if there is an available outlook in the given outlook data.
@@ -252,7 +265,7 @@ def check_outlook_availability(outlook_data):
             return True
     return False
 
-# Function to plot the polygons
+
 def plot_outlook_polygons(ax, outlook_type, outlook_data):  # skipcq: PY-R1000
     """
     Plots outlook polygons on a given axis.
@@ -341,7 +354,7 @@ def plot_outlook_polygons(ax, outlook_type, outlook_data):  # skipcq: PY-R1000
         log.error('Plotting Error. Outlook_Type' + outlook_type + 'error on line 598')
         popup('error', 'Plotting Error', 'An error has occured plotting the outlook. The program will now quit.')
 
-# Function to display a popup and end the program if no outlook is available
+
 def no_outlook_available():  # skipcq: PYL-R1711
     """
     Displays an error message when no severe weather outlook is available.
@@ -358,6 +371,7 @@ def no_outlook_available():  # skipcq: PYL-R1711
     log.info('There is no outlook available')
     popup('warning', 'No Outlook', "There is no outlook available at this time")
     return  # skipcq: PYL-R1711
+
 
 def display_outlook(outlook_type, outlook_data):
     """
@@ -393,6 +407,7 @@ def display_outlook(outlook_type, outlook_data):
 
     log.info('Showing the plot')
     plt.savefig(output_path, dpi=96, bbox_inches='tight')
+
 
 def color(outlook_type, outlook_level):
     # skipcq: FLK-W505
@@ -442,6 +457,7 @@ def color(outlook_type, outlook_level):
 
     return colors.get(outlook_level, 'blue')  # Returns the color, blue if not found
 
+
 def popup(popup_type, title, message):  # skipcq: PYL-R1710
     """
     The `popup` function displays different types of popups based on the input parameters such as
@@ -471,12 +487,22 @@ def popup(popup_type, title, message):  # skipcq: PYL-R1710
     else:
         messagebox.showerror('Invalid Popup', 'There was an error when trying to display a popup. The program will now quit.')
 
+
 def kickstart():
+    """
+    The `kickstart` function initializes and displays various types of weather outlook data.
+    
+    It fetches the outlook data for 'cat', 'tor', 'wind', and 'hail' using the `fetch_outlook` function.
+    
+    Then, it displays the outlook data for each type using the `display_outlook` function.
+    
+    :return: None
+    """
     cat_outlook_data = fetch_outlook('cat')
     tor_outlook_data = fetch_outlook('tor')
     wind_outlook_data = fetch_outlook('wind')
     hail_outlook_data = fetch_outlook('hail')
-    
+
     display_outlook('cat', cat_outlook_data)
     display_outlook('tor', tor_outlook_data)
     display_outlook('wind', wind_outlook_data)

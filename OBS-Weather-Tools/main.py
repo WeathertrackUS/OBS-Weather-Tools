@@ -116,7 +116,7 @@ def confirm_action():
         alerts_thread.start()
     else:
         alert_stop_event.set()
-    
+
     if spc_outlook_var.get():
         spc_outlook.kickstart()
 
