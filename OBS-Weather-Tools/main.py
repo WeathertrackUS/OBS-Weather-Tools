@@ -127,10 +127,10 @@ alert_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Scroll", variable=alert
 alert_checkbox.grid(row=2, column=0, padx=10, pady=10)
 
 spcoutlook_checkbox = ctk.CTkCheckBox(main_frame, text="SPC Outlook", variable=spc_outlook_var)
-spcoutlook_checkbox.grid(row=4, column=0, padx=10, pady=10)
+spcoutlook_checkbox.grid(row=3, column=0, padx=10, pady=10)
 
 confirm_button = ctk.CTkButton(main_frame, text="Confirm", command=confirm_action)
-confirm_button.grid(row=3, column=0, padx=10, pady=10)
+confirm_button.grid(row=4, column=0, padx=10, pady=10)
 
 live_alert_var.trace_add("write", update_dashboard_state)
 
