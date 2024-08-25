@@ -24,6 +24,7 @@ alert_stop_event = threading.Event()
 live_alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
 alert_var = tkinter.BooleanVar()
+spc_outlook_var = tkinter.BooleanVar ()
 
 
 def update_dashboard_state(*args):
@@ -124,6 +125,9 @@ dashboard_checkbox.grid(row=1, column=0, padx=10, pady=10)
 
 alert_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Scroll", variable=alert_var)
 alert_checkbox.grid(row=2, column=0, padx=10, pady=10)
+
+spcoutlook_checkbox = ctk.CTkCheckBox(main_frame, text="SPC Outlook", variable=spc_outlook_var)
+spcoutlook_checkbox.grid(row=4, column=0, padx=10, pady=10)
 
 confirm_button = ctk.CTkButton(main_frame, text="Confirm", command=confirm_action)
 confirm_button.grid(row=3, column=0, padx=10, pady=10)
