@@ -250,7 +250,7 @@ def fetch_and_update_alerts():  # skipcq: PY-R1000
                 "area": area_desc
             })
         else:
-            database.remove_alert(identifier=identifier, table_name="active_alerts")
+            database.remove_alert(identifier=identifier, table_name="sent_alerts")
 
     sorted_alerts = sort_alerts(active_alerts)
 
