@@ -459,7 +459,7 @@ def fetch_alerts():
     params = {
         "status": "actual",
         "message_type": "alert,update",
-        "code": 'TOR,TOA,SVR,SVA,FFW,SVS,SPS,HUW,TRW,SSW',
+        "code": 'TOR,TOA,SVR,SVA,FFW,SVS,SPS,SSW,HUW,TRW',
         "region_type": "land",
         "urgency": "Immediate,Future,Expected",
         "severity": "Extreme,Severe,Moderate",
@@ -486,28 +486,29 @@ def fetch_alerts():
             sent_datetime = parser.parse(sent).astimezone(pytz.utc)
             expires_datetime = parser.parse(expires).astimezone(pytz.utc)
 
-            if event in alerting_alerts:
-                if not database.alert_exists(identifier, 'sent_alerts'):
-                    # This is a new alert
-                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501  # skipcq: PYL-W0612
+            if not database.alert_exists(identifier, 'sent_alerts'):
+                # This is a new alert
+                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501  # skipcq: PYL-W0612
+                if event in alerting_alerts:
                     display_alert(event, notification_message, area_desc)
-                    database.insert(identifier=identifier, sent_datetime=sent_datetime,
+                database.insert(identifier=identifier, sent_datetime=sent_datetime,
+                                expires_datetime=expires_datetime, properties=properties,
+                                table_name='sent_alerts')
+            else:
+                existing_alert = database.get_alert(identifier, 'sent_alerts')
+                existing_sent_datetime_str = existing_alert[1]
+
+                # Convert existing_sent_datetime and existing_expires_datetime to UTC
+                existing_sent_datetime = parser.parse(existing_sent_datetime_str).replace(tzinfo=tz.tzutc())
+
+                if sent_datetime != existing_sent_datetime:
+                    # This is an update to an existing alert
+                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501
+                    if event in alerting_alerts:
+                        display_alert(event, notification_message, area_desc)
+                    database.update(identifier=identifier, sent_datetime=sent_datetime,
                                     expires_datetime=expires_datetime, properties=properties,
                                     table_name='sent_alerts')
-                else:
-                    existing_alert = database.get_alert(identifier, 'sent_alerts')
-                    existing_sent_datetime_str = existing_alert[1]
-
-                    # Convert existing_sent_datetime and existing_expires_datetime to UTC
-                    existing_sent_datetime = parser.parse(existing_sent_datetime_str).replace(tzinfo=tz.tzutc())
-
-                    if sent_datetime != existing_sent_datetime:
-                        # This is an update to an existing alert
-                        event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501
-                        display_alert(event, notification_message, area_desc)
-                        database.update(identifier=identifier, sent_datetime=sent_datetime,
-                                        expires_datetime=expires_datetime, properties=properties,
-                                        table_name='sent_alerts')
     update_active_alerts()
 
 

@@ -161,7 +161,7 @@ endpoint = "https://api.weather.gov/alerts/active"
 params = {
     "status": "actual",
     "message_type": "alert,update",
-    "code": 'TOR,SVR,FFW,SVS',
+    "code": 'TOR,SVR,FFW,SVS,SMW,HUW,TRW,SSW',
     "region_type": "land",
     "urgency": "Immediate,Future,Expected",
     "severity": "Extreme,Severe,Moderate",
