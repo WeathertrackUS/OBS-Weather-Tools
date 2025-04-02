@@ -28,8 +28,8 @@ obs_source_settings_old = {
 }
 
 obs_source_settings = {
-    "Tornado Warning": "Alert-TOR",
-    "Severe Thunderstorm Warning": "Alert-SVR"
+    "Tornado Warning": "TORAlertTest",
+    "Severe Thunderstorm Warning": "SevereAlertTest"
 }
 
 '''obs_scene_ids = {

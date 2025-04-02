@@ -2,6 +2,7 @@ import os
 import requests
 from obswebsocket import obsws, requests as obs_requests
 import time
+from obswebsocket.exceptions import ConnectionFailure
 
 
 # OBS WebSocket settings
@@ -211,13 +212,14 @@ def fetch_alerts(stop_event):
 
                         event = properties["event"]
                         description = properties["description"]
+                        areadesc = properties["areaDesc"]
                         instruction = properties["instruction"]
 
                         headline = properties["headline"]
                         print(f"headline: {headline}")
 
                         if headline:
-                            warning_text = f'{headline}   {description}   Protective Actions: {instruction}'
+                            warning_text = f'{headline} for {areadesc}. Protective Actions: {instruction}'
                         else:
                             warning_text = f'{description}   Protective Actions: {instruction}'
 
@@ -226,7 +228,6 @@ def fetch_alerts(stop_event):
                     pass
         else:
             pass
-
 
 def processing(event, warning_text):
     """
@@ -276,7 +277,7 @@ def display(source):
         scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
 
         ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=True))
-        time.sleep(180)
+        time.sleep(30)
         ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
 
         ws.disconnect()
