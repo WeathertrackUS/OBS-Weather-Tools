@@ -10,20 +10,26 @@ from dateutil import parser, tz
 import atexit
 from live_alert_dashboard import update_active_alerts
 import pytz
+import json  # Add this import for JSON serialization
 
 # OBS WebSocket settings
-obs_socket_ip = "216.16.115.246"
+obs_socket_ip = "192.168.4.78"
 obs_socket_port = 4455
 obs_socket_password = "VJFfpubelSgccfYR"
 
 # OBS source settings
-obs_source_settings = {
+obs_source_settings_old = {
     "Tornado Warning": "Alert-TOR",
     "Severe Thunderstorm Warning": "Alert-SVR",
     "Flash Flood Warning": "Alert-FFW",
     "Severe Thunderstorm Watch": "Alert-SVA",
     "Tornado Watch": "Alert-TOA",
     "Special Weather Statement": "Alert-SPS"
+}
+
+obs_source_settings = {
+    "Tornado Warning": "Alert-TOR",
+    "Severe Thunderstorm Warning": "Alert-SVR"
 }
 
 '''obs_scene_ids = {
@@ -42,6 +48,9 @@ if not os.path.exists('files/warnings'):
     os.makedirs('files/warnings')
 if not os.path.exists('files/count'):
     os.makedirs('files/count')
+# Add this for warning info files
+if not os.path.exists('files'):
+    os.makedirs('files')
 
 # Initialize the warning files with their names and 0
 warning_files = {
@@ -324,11 +333,20 @@ def write_to_file(FILENAME, content1):  # skipcq: PYL-R1710
     Returns:
     None
     """
-    if FILENAME not in (warning_count_files, warning_files, "Warning Header.txt", "Warning Description.txt", "Warning Area.txt"):
-        return "Invalid filename"
+    # Fix the validation to properly handle the Warning info files
+    valid_files = list(warning_count_files.keys()) + list(warning_files.keys()) + ["Warning Header.txt", "Warning Info.txt", "Warning Area.txt"]
 
-    with open(FILENAME, "w") as file2:
-        file2.write(content1 + "\n")
+    # Check if the filename is a full path
+    if os.path.basename(FILENAME) in valid_files or FILENAME in valid_files:
+        # Ensure directory exists for the file
+        directory = os.path.dirname(FILENAME)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+
+        with open(FILENAME, "w") as file2:
+            file2.write(content1 + "\n")
+    else:
+        return "Invalid filename"
 
 
 def read_from_file(filename1):
@@ -341,19 +359,27 @@ def read_from_file(filename1):
     Returns:
     int: The integer read from the file. If the file does not exist or is empty, returns 0.
     """
-    if filename1 not in (warning_count_files, warning_files, "Warning Header.txt", "Warning Description.txt", "Warning Area.txt"):
-        return "Invalid filename"
+    # Fix the validation to properly handle the Warning info files
+    valid_files = list(warning_count_files.keys()) + list(warning_files.keys()) + ["Warning Header.txt", "Warning Info.txt", "Warning Area.txt"]
 
-    try:
-        with open(filename1, "r") as file1:
-            file_content = file1.read().strip()
-            if file_content:
-                # Remove any null bytes or invalid characters before converting to int
-                cleaned_content = ''.join(char for char in file_content if char.isprintable())
-                return int(cleaned_content)
+    # Check if the filename is a full path
+    if os.path.basename(filename1) in valid_files or filename1 in valid_files:
+        try:
+            with open(filename1, "r") as file1:
+                file_content = file1.read().strip()
+                if file_content:
+                    # Remove any null bytes or invalid characters before converting to int
+                    cleaned_content = ''.join(char for char in file_content if char.isprintable())
+                    try:
+                        return int(cleaned_content)
+                    except ValueError:
+                        # If it's not an integer, return the string content
+                        return cleaned_content
+                return 0
+        except FileNotFoundError:
             return 0
-    except (FileNotFoundError, ValueError):
-        return 0
+    else:
+        return "Invalid filename"
 
 
 def get_current_scene():
@@ -459,7 +485,7 @@ def fetch_alerts():
     params = {
         "status": "actual",
         "message_type": "alert,update",
-        "code": 'TOR,TOA,SVR,SVA,FFW,SVS,SPS,HUW,TRW,SSW',
+        "code": 'TOR,TOA,SVR,SVA,FFW,SVS,SPS,SSW,HUW,TRW',
         "region_type": "land",
         "urgency": "Immediate,Future,Expected",
         "severity": "Extreme,Severe,Moderate",
@@ -486,28 +512,36 @@ def fetch_alerts():
             sent_datetime = parser.parse(sent).astimezone(pytz.utc)
             expires_datetime = parser.parse(expires).astimezone(pytz.utc)
 
-            if event in alerting_alerts:
-                if not database.alert_exists(identifier, 'sent_alerts'):
-                    # This is a new alert
-                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501  # skipcq: PYL-W0612
+            # Convert properties dict to JSON string for database storage
+            properties_json = json.dumps(properties)
+
+            if not database.alert_exists(identifier, 'sent_alerts'):
+                # This is a new alert
+                event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501  # skipcq: PYL-W0612
+                if event in alerting_alerts:
                     display_alert(event, notification_message, area_desc)
-                    database.insert(identifier=identifier, sent_datetime=sent_datetime,
-                                    expires_datetime=expires_datetime, properties=properties,
-                                    table_name='sent_alerts')
-                else:
-                    existing_alert = database.get_alert(identifier, 'sent_alerts')
-                    existing_sent_datetime_str = existing_alert[1]
+                database.insert(identifier=identifier,
+                                sent_datetime=sent_datetime,
+                                expires_datetime=expires_datetime,
+                                properties=properties_json,  # Use the JSON string instead of the dict
+                                table_name='sent_alerts')
+            else:
+                existing_alert = database.get_alert(identifier, 'sent_alerts')
+                existing_sent_datetime_str = existing_alert[1]
 
-                    # Convert existing_sent_datetime and existing_expires_datetime to UTC
-                    existing_sent_datetime = parser.parse(existing_sent_datetime_str).replace(tzinfo=tz.tzutc())
+                # Convert existing_sent_datetime and existing_expires_datetime to UTC
+                existing_sent_datetime = parser.parse(existing_sent_datetime_str).replace(tzinfo=tz.tzutc())
 
-                    if sent_datetime != existing_sent_datetime:
-                        # This is an update to an existing alert
-                        event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501
+                if sent_datetime != existing_sent_datetime:
+                    # This is an update to an existing alert
+                    event, notification_message, area_desc, expires_datetime, description = live_alerts_processing.process_alert(properties, area_desc)  # skipcq: FLK-E501
+                    if event in alerting_alerts:
                         display_alert(event, notification_message, area_desc)
-                        database.update(identifier=identifier, sent_datetime=sent_datetime,
-                                        expires_datetime=expires_datetime, properties=properties,
-                                        table_name='sent_alerts')
+                    database.update(identifier=identifier,
+                                    sent_datetime=sent_datetime,
+                                    expires_datetime=expires_datetime,
+                                    properties=properties_json,  # Use the JSON string instead of the dict
+                                    table_name='sent_alerts')
     update_active_alerts()
 
 
@@ -552,12 +586,15 @@ def display_alert(event, notification_message, area_desc):
     current_time = now.strftime("%H:%M:%S")
     print(f'{current_time} - {notification_message}, {area_desc}')
 
-    # Write the headline to the Warning Header.txt file
-    write_to_file("files/Warning Header.txt", event)
+    # Create files directory if it doesn't exist
+    if not os.path.exists('files'):
+        os.makedirs('files')
 
-    write_to_file("files/Warning Info.txt", notification_message)
+    # Write the headline to the Warning Header.txt file with full paths
+    write_to_file(os.path.join("files", "Warning Header.txt"), event)
+    write_to_file(os.path.join("files", "Warning Info.txt"), notification_message)
+    write_to_file(os.path.join("files", "Warning Area.txt"), area_desc)
 
-    write_to_file("files/Warning Area.txt", area_desc)
     time.sleep(2)
 
     # Connect to the OBS WebSocket
@@ -565,14 +602,18 @@ def display_alert(event, notification_message, area_desc):
     ws.connect()
 
     source_name = obs_source_settings.get(event)
-    scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
-
-    ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=True))
-    time.sleep(5)
-    ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
+    if source_name:  # Check if source_name is not None
+        scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
+        if all((scene_name, scene_uuid, scene_item_id)):  # Check if we got all the values
+            ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=True))
+            time.sleep(5)
+            ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
+        else:
+            print(f"Could not find source '{source_name}' in the current scene.")
+    else:
+        print(f"No OBS source configured for event type: {event}")
 
     time.sleep(3)
-
     ws.disconnect()
 
 
@@ -590,7 +631,5 @@ def kickstart(stop_event):
         None
     """
     while not stop_event.is_set():
-        database.create_table('sent_alerts', '(id TEXT PRIMARY KEY, sent_datetime TEXT, expires_datetime TEXT, properties TEXT)')
-        database.clear_database('sent_alerts')
         fetch_alerts()
         time.sleep(5)  # Wait for 5 seconds before checking for new alerts

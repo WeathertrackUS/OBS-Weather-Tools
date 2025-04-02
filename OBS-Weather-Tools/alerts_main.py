@@ -5,7 +5,7 @@ import time
 
 
 # OBS WebSocket settings
-obs_socket_ip = "216.16.115.246"
+obs_socket_ip = "192.168.4.78"
 obs_socket_port = 4455
 obs_socket_password = "VJFfpubelSgccfYR"
 
@@ -126,11 +126,22 @@ def write_to_file(filename1, content2):  # skipcq: PYL-R1710
     Returns:
         None
     """
-    if filename1 not in ("header1Text.txt", "desc1Text.txt"):
+    valid_files = {
+        "header1Text.txt": "files/headerText/header1Text.txt",
+        "desc1Text.txt": "files/descText/desc1Text.txt"
+    }
+
+    if filename1 not in valid_files:
+        print(f"Invalid filename: {filename1}")
         return "Invalid filename"
 
-    with open(filename1, "w") as file2:
-        file2.write(content2 + "\n")
+    file_path = valid_files[filename1]
+    try:
+        with open(file_path, "w") as file2:
+            file2.write(content2 + "\n")
+        print(f"Successfully wrote to {file_path}: {content2}")
+    except Exception as e:
+        print(f"Error writing to file {file_path}: {e}")
 
 
 def read_from_file(FILENAME):
@@ -161,7 +172,7 @@ endpoint = "https://api.weather.gov/alerts/active"
 params = {
     "status": "actual",
     "message_type": "alert,update",
-    "code": 'TOR,SVR,FFW,SVS',
+    "code": 'TOR,SVR,FFW,SVS,SMW,HUW,TRW,SSW',
     "region_type": "land",
     "urgency": "Immediate,Future,Expected",
     "severity": "Extreme,Severe,Moderate",
@@ -192,8 +203,9 @@ def fetch_alerts(stop_event):
             data = response.json()
             features = data["features"]
 
-            if alert in features:  # skipcq: PYL-E0601
-                for alert in features:
+            for feature in features:
+                alert = feature  # Ensure 'alert' is assigned a value
+                if alert in features:  # skipcq: PYL-E0601
                     while not stop_event.is_set():
                         properties = alert["properties"]
 
@@ -201,8 +213,8 @@ def fetch_alerts(stop_event):
                         description = properties["description"]
                         instruction = properties["instruction"]
 
-                        parameters = properties["parameters"]
-                        headline = parameters["NWSheadline"]
+                        headline = properties["headline"]
+                        print(f"headline: {headline}")
 
                         if headline:
                             warning_text = f'{headline}   {description}   Protective Actions: {instruction}'
@@ -210,8 +222,8 @@ def fetch_alerts(stop_event):
                             warning_text = f'{description}   Protective Actions: {instruction}'
 
                         processing(event, warning_text)
-            else:
-                pass
+                else:
+                    pass
         else:
             pass
 
@@ -227,9 +239,19 @@ def processing(event, warning_text):
     Returns:
         None
     """
-    write_to_file("files/headerText/header1Text.txt", event)
+    print(f"Processing event: {event}")
+    write_result = write_to_file("header1Text.txt", event)
+    if write_result == "Invalid filename":
+        print("Failed to write event to header file.")
+    else:
+        print(f"Event written to header file: {event}")
+
     single_line_warning = ' '.join(warning_text.split())
-    write_to_file("files/descText/desc1Text.txt", f"{single_line_warning}   ")
+    write_result = write_to_file("desc1Text.txt", f"{single_line_warning}   ")
+    if write_result == "Invalid filename":
+        print("Failed to write warning text to description file.")
+    else:
+        print(f"Warning text written to description file: {single_line_warning}")
 
     time.sleep(2)
 
@@ -246,17 +268,21 @@ def display(source):
     Returns:
         None
     """
-    ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
-    ws.connect()
+    try:
+        ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+        ws.connect()
 
-    source_name = obs_source_settings.get(source)
-    scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
+        source_name = obs_source_settings.get(source)
+        scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
 
-    ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=True))
-    time.sleep(180)
-    ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
+        ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=True))
+        time.sleep(180)
+        ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
 
-    ws.disconnect()
+        ws.disconnect()
+    except obsws.exceptions.ConnectionFailure as e:
+        print(f"OBS WebSocket connection failed: {e}")
+        time.sleep(5)  # Retry after a delay
 
 
 def kickstart(stop_event):

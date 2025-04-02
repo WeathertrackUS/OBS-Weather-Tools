@@ -7,6 +7,7 @@ import customtkinter as ctk
 import threading
 import alerts_main
 import spc_outlook
+import database
 
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
@@ -17,6 +18,9 @@ root.title("OBS Weather Tools")
 
 main_frame = ctk.CTkFrame(master=root)
 main_frame.grid(row=0, column=0, padx=10, pady=10)
+
+alerts_thread = None
+dashboard_thread = None
 
 live_alert_stop_event = threading.Event()
 dashboard_stop_event = threading.Event()
@@ -55,7 +59,7 @@ def start_dashboard():
     Returns:
         None
     """
-    global dashboard_thread  # skipcq: PYL-W0602  # skipcq: PYL-W0601
+    global dashboard_thread  # skipcq: PYL-W0603  # skipcq: PYL-W0601
     if dashboard_thread is None or not dashboard_thread.is_alive():
         dashboard_thread = threading.Thread(target=dashboard_kickstart, args=(dashboard_stop_event,))
         dashboard_thread.start()
@@ -95,6 +99,8 @@ def confirm_action():
     Returns:
         None
     """
+    # skipcq: PYL-W0603
+    global alerts_thread
     if live_alert_var.get():
         if not alerts_thread or not alerts_thread.is_alive():  # skipcq: PYL-E0601
             alert_stop_event.clear()
@@ -137,5 +143,7 @@ confirm_button = ctk.CTkButton(main_frame, text="Confirm", command=confirm_actio
 confirm_button.grid(row=4, column=0, padx=10, pady=10)
 
 live_alert_var.trace_add("write", update_dashboard_state)
+
+database.create_table('sent_alerts', '(id TEXT PRIMARY KEY, sent_datetime TEXT, expires_datetime TEXT, properties TEXT)')
 
 root.mainloop()
