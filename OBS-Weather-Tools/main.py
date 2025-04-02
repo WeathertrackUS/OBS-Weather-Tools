@@ -7,6 +7,7 @@ import customtkinter as ctk
 import threading
 import alerts_main
 import spc_outlook
+import database
 
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
@@ -142,5 +143,7 @@ confirm_button = ctk.CTkButton(main_frame, text="Confirm", command=confirm_actio
 confirm_button.grid(row=4, column=0, padx=10, pady=10)
 
 live_alert_var.trace_add("write", update_dashboard_state)
+
+database.create_table('sent_alerts', '(id TEXT PRIMARY KEY, sent_datetime TEXT, expires_datetime TEXT, properties TEXT)')
 
 root.mainloop()

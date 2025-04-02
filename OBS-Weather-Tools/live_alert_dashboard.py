@@ -6,7 +6,8 @@ from datetime import datetime, timezone, timedelta
 import os
 import re
 from collections import OrderedDict
-import ast
+import json  # Use json instead of ast for safer deserialization
+from dateutil import parser  # Add this import for better date parsing
 
 base_dir = '.'
 
@@ -150,8 +151,19 @@ def fetch_and_update_alerts():  # skipcq: PY-R1000
     for alert in alerts:
         identifier, sent_datetime_str, expires_datetime_str, properties_str = alert  # skipcq: PYL-W0612
 
-        expires_datetime = datetime.strptime(expires_datetime_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
-        properties = ast.literal_eval(properties_str)  # Convert the string back to a dictionary
+        # Use dateutil.parser for more robust datetime parsing
+        try:
+            # Handle datetime strings with timezone information
+            expires_datetime = parser.parse(expires_datetime_str)
+            if expires_datetime.tzinfo is None:
+                # If no timezone info, assume UTC
+                expires_datetime = expires_datetime.replace(tzinfo=timezone.utc)
+        except Exception as e:
+            print(f"Error parsing datetime: {e}")
+            # Skip this alert if we can't parse the date
+            continue
+
+        properties = json.loads(properties_str)  # Convert the JSON string back to a dictionary
 
         alert_endtime = properties["expires"]
         alert_endtime_tz_offset = alert_endtime[-6:]  # Extract the timezone offset from the string
