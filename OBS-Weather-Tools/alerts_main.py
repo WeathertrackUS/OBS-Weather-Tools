@@ -3,6 +3,8 @@ import requests
 from obswebsocket import obsws, requests as obs_requests
 import time
 from obswebsocket.exceptions import ConnectionFailure
+import sqlite3  # Add SQLite for tracking processed alerts
+import threading
 
 
 # OBS WebSocket settings
@@ -14,6 +16,10 @@ obs_socket_password = "VJFfpubelSgccfYR"
 obs_source_settings = {
     "Warning Feed": "Warning-Feed"
 }
+
+# Global list to store active alerts
+active_alerts = []
+current_alert_index = 0  # Pointer to track the current alert being displayed
 
 
 def get_current_scene():
@@ -184,14 +190,55 @@ params = {
 response = requests.get(endpoint, params=params)
 
 
+# Initialize SQLite database to track processed alerts
+def initialize_database():
+    """
+    Initializes the SQLite database to track processed alerts.
+    """
+    conn = sqlite3.connect("alerts.db")
+    cursor = conn.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS processed_alerts (id TEXT PRIMARY KEY)""")
+    conn.commit()
+    conn.close()
+
+
+def is_alert_processed(alert_id):
+    """
+    Checks if an alert has already been processed.
+
+    Parameters:
+        alert_id (str): The unique ID of the alert.
+
+    Returns:
+        bool: True if the alert has been processed, False otherwise.
+    """
+    conn = sqlite3.connect("alerts.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM processed_alerts WHERE id = ?", (alert_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
+
+
+def mark_alert_as_processed(alert_id):
+    """
+    Marks an alert as processed by adding its ID to the database.
+
+    Parameters:
+        alert_id (str): The unique ID of the alert.
+    """
+    conn = sqlite3.connect("alerts.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO processed_alerts (id) VALUES (?)", (alert_id,))
+    conn.commit()
+    conn.close()
+
+
 def fetch_alerts(stop_event):
     """
-    Fetches and processes weather alerts from a given response.
+    Fetches weather alerts and replaces the global active_alerts list.
 
-    This function continuously checks for new alerts until the stop event is set.
-    It processes each alert by extracting relevant information such as the event,
-    description, instruction, and headline. The alert is then passed to the
-    processing function for further handling.
+    This function periodically fetches alerts and replaces the list with new ones.
 
     Parameters:
         stop_event (threading.Event): An event that signals the function to stop.
@@ -199,35 +246,71 @@ def fetch_alerts(stop_event):
     Returns:
         None
     """
+    global active_alerts
     while not stop_event.is_set():
         if response.status_code == 200:
             data = response.json()
             features = data["features"]
 
+            new_alerts = []
             for feature in features:
-                alert = feature  # Ensure 'alert' is assigned a value
-                if alert in features:  # skipcq: PYL-E0601
-                    while not stop_event.is_set():
-                        properties = alert["properties"]
+                alert_id = feature["id"]  # Each alert has a unique ID
+                if is_alert_processed(alert_id):
+                    continue  # Skip already processed alerts
 
-                        event = properties["event"]
-                        description = properties["description"]
-                        areadesc = properties["areaDesc"]
-                        instruction = properties["instruction"]
+                properties = feature["properties"]
+                event = properties["event"]
+                description = properties["description"]
+                areadesc = properties["areaDesc"]
+                instruction = properties["instruction"]
 
-                        headline = properties["headline"]
-                        print(f"headline: {headline}")
+                headline = properties.get("headline", "")
+                warning_text = (
+                    f'{headline} for {areadesc}. Protective Actions: {instruction}'
+                    if headline
+                    else f'{description}   Protective Actions: {instruction}'
+                )
 
-                        if headline:
-                            warning_text = f'{headline} for {areadesc}. Protective Actions: {instruction}'
-                        else:
-                            warning_text = f'{description}   Protective Actions: {instruction}'
+                new_alerts.append({"id": alert_id, "event": event, "warning_text": warning_text})
+                mark_alert_as_processed(alert_id)  # Mark the alert as processed
 
-                        processing(event, warning_text)
-                else:
-                    pass
+            # Replace the global active_alerts list with the new alerts
+            active_alerts = new_alerts
+
         else:
-            pass
+            print(f"Failed to fetch alerts: {response.status_code}")
+
+        time.sleep(300)  # Wait for 5 minutes before fetching alerts again
+
+
+def iterate_alerts(stop_event):
+    """
+    Iterates through the active alerts list and displays each alert in a loop.
+
+    Parameters:
+        stop_event (threading.Event): An event that signals the function to stop.
+
+    Returns:
+        None
+    """
+    global active_alerts, current_alert_index
+    while not stop_event.is_set():
+        if active_alerts:
+            # Get the current alert
+            alert = active_alerts[current_alert_index]
+            event = alert["event"]
+            warning_text = alert["warning_text"]
+
+            # Process and display the alert
+            processing(event, warning_text)
+
+            # Move to the next alert
+            current_alert_index = (current_alert_index + 1) % len(active_alerts)
+        else:
+            print("No active alerts to display.")
+            current_alert_index = 0  # Reset the index when the list is empty
+            time.sleep(5)  # Wait before checking again
+
 
 def processing(event, warning_text):
     """
@@ -277,7 +360,7 @@ def display(source):
         scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
 
         ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=True))
-        time.sleep(30)
+        time.sleep(15)
         ws.call(obs_requests.SetSceneItemEnabled(sceneName=scene_name, sceneUuid=scene_uuid, sceneItemId=scene_item_id, sceneItemEnabled=False))
 
         ws.disconnect()
@@ -288,7 +371,7 @@ def display(source):
 
 def kickstart(stop_event):
     """
-    Initializes the alert fetching process and runs it indefinitely until the stop event is triggered.
+    Initializes the alert fetching and scrolling process.
 
     Parameters:
         stop_event (threading.Event): An event object used to signal the function to stop its execution.
@@ -296,5 +379,12 @@ def kickstart(stop_event):
     Returns:
         None
     """
-    while not stop_event.is_set():
-        fetch_alerts(stop_event)
+    # Initialize the database
+    initialize_database()
+
+    fetch_thread = threading.Thread(target=fetch_alerts, args=(stop_event,))
+    iterate_thread = threading.Thread(target=iterate_alerts, args=(stop_event,))
+
+    # Start the threads
+    fetch_thread.start()
+    iterate_thread.start()
