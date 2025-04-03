@@ -8,6 +8,12 @@ import threading
 import alerts_main
 import spc_outlook
 import database
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+logging.debug("Starting OBS Weather Tools main.py")
 
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
@@ -30,6 +36,7 @@ live_alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
 alert_var = tkinter.BooleanVar()
 spc_outlook_var = tkinter.BooleanVar()
+alert_scroll_var = tkinter.BooleanVar()
 
 
 def update_dashboard_state(*args):
@@ -79,10 +86,24 @@ def stop_dashboard():
         dashboard_thread._stop()  # skipcq: PYL-W0212
 
 
+def enable_alert_scroll():
+    """
+    Enables the new alert scroll (beta) by starting the Flask webserver.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
+    import subprocess
+    subprocess.Popen(['python', 'webserver.py'], cwd='e:\\OBS-Weather-Tools\\obs-weather-tools')
+
+
 def confirm_action():
     """
     Confirms the current action based on the state of the live alert,
-    dashboard, and alert variables.
+    dashboard, alert, and alert scroll variables.
 
     It checks the state of the live alert variable
     and starts or stops the live alerts thread accordingly.
@@ -99,6 +120,7 @@ def confirm_action():
     Returns:
         None
     """
+    logging.debug("Confirm action called.")
     # skipcq: PYL-W0603
     global alerts_thread
     if live_alert_var.get():
@@ -126,6 +148,10 @@ def confirm_action():
     if spc_outlook_var.get():
         spc_outlook.kickstart()
 
+    if alert_scroll_var.get():
+        logging.debug("Alert scroll (Beta) enabled.")
+        enable_alert_scroll()
+
 
 live_alert_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Monitor", variable=live_alert_var, command=update_dashboard_state)
 live_alert_checkbox.grid(row=0, column=0, padx=10, pady=10)
@@ -133,14 +159,17 @@ live_alert_checkbox.grid(row=0, column=0, padx=10, pady=10)
 dashboard_checkbox = ctk.CTkCheckBox(main_frame, text="Dashboard", variable=dashboard_var, state="disabled")
 dashboard_checkbox.grid(row=1, column=0, padx=10, pady=10)
 
-alert_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Scroll", variable=alert_var)
+alert_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Scroll (Backup)", variable=alert_var)
 alert_checkbox.grid(row=2, column=0, padx=10, pady=10)
 
 spcoutlook_checkbox = ctk.CTkCheckBox(main_frame, text="SPC Outlook", variable=spc_outlook_var)
 spcoutlook_checkbox.grid(row=3, column=0, padx=10, pady=10)
 
+alert_scroll_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Scroll (Beta)", variable=alert_scroll_var)
+alert_scroll_checkbox.grid(row=4, column=0, padx=10, pady=10)
+
 confirm_button = ctk.CTkButton(main_frame, text="Confirm", command=confirm_action)
-confirm_button.grid(row=4, column=0, padx=10, pady=10)
+confirm_button.grid(row=5, column=0, padx=10, pady=10)
 
 live_alert_var.trace_add("write", update_dashboard_state)
 

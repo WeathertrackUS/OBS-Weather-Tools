@@ -1,0 +1,124 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 100vh;
+}
+
+/* Enhance smooth transition for alert changes */
+.alert-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 200px 10px 60px; /* Maintained left and right padding */
+    position: fixed;
+    bottom: 0;
+    font-family: 'Arial Black', sans-serif;
+    transition: all 1s ease-in-out, opacity 1s ease-in-out; /* Extended duration and added opacity transition */
+    opacity: 1;
+}
+
+.alert-container.hidden {
+    opacity: 0; /* Fade out effect for smoother transitions */
+}
+
+.alert-content {
+    flex: 1;
+    text-align: center;
+}
+
+.alert-header {
+    flex: 0 1 auto; /* Dynamically adjust width to text */
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 5px 90px; /* Increased padding for better spacing */
+    background: linear-gradient(to right, #ffcc00, #ff9900);
+    color: #fff;
+    border-radius: 5px;
+    margin-right: 2px; /* Reduced the margin between the alert name and the description text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0; /* Removed unnecessary bottom margin */
+    transition: color 0.5s ease-in-out, background 0.5s ease-in-out; /* Smooth transition for text and background changes */
+}
+
+.alert-horizontal {
+    flex: 5;
+    display: flex;
+    align-items: flex-start; /* Align description text closer to the top */
+    padding-left: 20px;
+    padding-right: 20px;
+    background: transparent;
+    border-radius: 5px;
+}
+
+.alert-details, .alert-locations, .alert-expiration {
+    margin: 0; /* Removed any extra margins */
+    padding: 0 5px; /* Reduced padding for tighter alignment */
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #000;
+    transition: color 0.5s ease-in-out, background 0.5s ease-in-out; /* Smooth transition for text and background changes */
+}
+
+.alert-details {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    padding-left: 20px;
+    padding-right: 15px;
+    margin: 0px;
+    overflow-y: auto; /* Added to allow scrolling if content overflows */
+    max-width: 25%; /* Added to limit width and allow scrolling */
+}
+
+.alert-locations {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    padding-left: 20px;
+    padding-right: 15px;
+    margin: 0px;
+    overflow-y: auto; /* Added to allow scrolling if content overflows */
+    max-width: 25%;
+}
+
+.alert-expiration {
+    max-width: 25%;
+    padding-right: 150px; /* Removed right padding for better alignment */
+    overflow-y: auto;
+    margin: 0px;
+    padding-left: 20px;
+}
+
+/* Background colors for different alert types */
+.alert-container.severe-thunderstorm {
+    background: linear-gradient(to right, #ffcc00, #ff9900);
+}
+
+.alert-container.tornado-warning {
+    background: linear-gradient(to right, #d9534f, #c9302c);
+}
+
+.alert-container.tornado-warning .alert-header {
+    background: linear-gradient(to right, #d9534f, #c9302c); /* Tornado Warning color */
+}
+
+.alert-container.severe-thunderstorm .alert-header {
+    background: linear-gradient(to right, #ffcc00, #ff9900); /* Severe Thunderstorm Warning color */
+}
+
+/* Add a visual indicator for no active alerts */
+.alert-container.no-alerts {
+    background-color: #ccc;
+    color: #333;
+    border-top: 2px dashed #999;
+    text-align: center;
+    font-style: italic;
+}
