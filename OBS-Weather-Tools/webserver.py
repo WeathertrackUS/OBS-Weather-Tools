@@ -45,7 +45,14 @@ def get_alerts():
 
     # Convert alerts from tuples to dictionaries
     alert_keys = ["id", "event", "details", "expiration_time", "locations"]
-    alerts = [dict(zip(alert_keys, alert)) for alert in alerts]
+    max_length = 100  # Define a maximum length for the locations text
+    alerts = [
+        {
+            **dict(zip(alert_keys, alert)),
+            "scroll_required": len(alert[4]) > max_length  # Add a flag if locations text is too long
+        }
+        for alert in alerts
+    ]
 
     logging.debug(f"Active alerts fetched: {alerts}")
     return jsonify(alerts)
@@ -67,7 +74,7 @@ nws_endpoint = "https://api.weather.gov/alerts/active"
 nws_params = {
     "status": "actual",
     "message_type": "alert,update",
-    "code": "TOR,SVR,SVS",
+    "code": "TOR,SVR,SVS,FFW",
     "region_type": "land",
     "urgency": "Immediate,Future,Expected",
     "severity": "Extreme,Severe,Moderate",
@@ -104,6 +111,8 @@ def update_alerts():
                         details = f"Tornado: {tornado_detection}, Hail Size: {hail_size}"
                     elif event == "Severe Thunderstorm Warning":
                         details = f"Wind Gusts: {wind_gust}, Hail Size: {hail_size}"
+                    elif event == "Flash Flood Warning":
+                        details = "Flash flooding is occurring or imminent."
                     else:
                         details = "Details not available"
 

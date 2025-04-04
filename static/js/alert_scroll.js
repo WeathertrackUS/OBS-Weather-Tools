@@ -3,7 +3,14 @@ async function fetchAlerts() {
         const response = await fetch('/alerts');
         const alerts = await response.json();
         const alertText = alerts.map(alert => `${alert.event}: ${alert.details}`).join(' | ');
-        document.getElementById('alert-text').textContent = alertText;
+        const alertTextElement = document.getElementById('alert-text');
+        alertTextElement.textContent = alertText;
+
+        // Dynamically adjust the animation duration based on text width
+        const containerWidth = alertTextElement.parentElement.offsetWidth;
+        const textWidth = alertTextElement.scrollWidth;
+        const animationDuration = Math.max(15, (textWidth / containerWidth) * 15); // Adjust duration proportionally
+        alertTextElement.style.animationDuration = `${animationDuration}s`;
     } catch (error) {
         console.error('Error fetching alerts:', error);
     }

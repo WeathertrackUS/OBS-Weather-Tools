@@ -5,7 +5,6 @@ from live_alert_dashboard import dashboard_kickstart
 import tkinter
 import customtkinter as ctk
 import threading
-import alerts_main
 import spc_outlook
 import database
 import logging
@@ -34,7 +33,6 @@ alert_stop_event = threading.Event()
 
 live_alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
-alert_var = tkinter.BooleanVar()
 spc_outlook_var = tkinter.BooleanVar()
 alert_scroll_var = tkinter.BooleanVar()
 
@@ -138,13 +136,6 @@ def confirm_action():
     else:
         dashboard_stop_event.set()
 
-    if alert_var.get():
-        alert_stop_event.clear()
-        alerts_thread = threading.Thread(target=alerts_main.kickstart, args=(alert_stop_event,))
-        alerts_thread.start()
-    else:
-        alert_stop_event.set()
-
     if spc_outlook_var.get():
         spc_outlook.kickstart()
 
@@ -158,9 +149,6 @@ live_alert_checkbox.grid(row=0, column=0, padx=10, pady=10)
 
 dashboard_checkbox = ctk.CTkCheckBox(main_frame, text="Dashboard", variable=dashboard_var, state="disabled")
 dashboard_checkbox.grid(row=1, column=0, padx=10, pady=10)
-
-alert_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Scroll (Backup)", variable=alert_var)
-alert_checkbox.grid(row=2, column=0, padx=10, pady=10)
 
 spcoutlook_checkbox = ctk.CTkCheckBox(main_frame, text="SPC Outlook", variable=spc_outlook_var)
 spcoutlook_checkbox.grid(row=3, column=0, padx=10, pady=10)

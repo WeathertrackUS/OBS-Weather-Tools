@@ -36,14 +36,23 @@ function displayAlert(alert) {
         container.classList.add('severe-thunderstorm');
     } else if (alert.event && alert.event.toLowerCase().includes('tornado')) {
         container.classList.add('tornado-warning');
+    } else if (alert.event && alert.event.toLowerCase().includes('flash flood')) {
+        container.classList.add('flash-flood-warning');
     }
 
     document.getElementById('alert-header').textContent = alert.event || 'Unknown Event';
     document.getElementById('alert-details').textContent = alert.details || 'No details available';
-    document.getElementById('alert-locations').textContent = alert.locations || 'No locations specified';
-    document.getElementById('alert-expiration').textContent = `Expires: ${alert.expiration_time ? new Date(alert.expiration_time).toLocaleString() : 'Unknown'}`;
+    const locationsElement = document.getElementById('alert-locations');
+    locationsElement.textContent = alert.locations || 'No locations specified';
 
-    enableScrollingIfNeeded(); // Check if scrolling is needed for locations
+    // Apply scrolling logic based on the `scroll_required` flag
+    if (alert.scroll_required) {
+        locationsElement.classList.add('scrollable');
+    } else {
+        locationsElement.classList.remove('scrollable');
+    }
+
+    document.getElementById('alert-expiration').textContent = `Expires: ${alert.expiration_time ? new Date(alert.expiration_time).toLocaleString() : 'Unknown'}`;
 }
 
 function displayNoAlerts() {
@@ -68,11 +77,12 @@ function cycleAlerts() {
 }
 
 function enableScrollingIfNeeded() {
+    const locationsContainer = document.getElementById('alert-locations-container');
     const locationsElement = document.getElementById('alert-locations');
 
     // Measure the text width and container width
     const textWidth = locationsElement.scrollWidth;
-    const containerWidth = locationsElement.offsetWidth;
+    const containerWidth = locationsContainer.offsetWidth;
 
     // Check if scrolling is needed
     if (textWidth > containerWidth) {
