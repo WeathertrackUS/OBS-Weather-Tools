@@ -1,7 +1,8 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import logging
+from dateutil import parser
 
 ALLOWED_TABLES = {'sent_alerts', 'active_alerts'}
 ALLOWED_COLUMNS = {'id', 'event', 'sent_datetime', 'expires_datetime', 'properties', 'description', 'instruction', 'details', 'expiration_time', 'locations'}
@@ -258,6 +259,9 @@ def insert_or_update_alert(alert_id, event, details, expiration_time, locations)
         None
     """
     try:
+        # Parse the expiration time and convert to UTC
+        expiration_time_utc = parser.isoparse(expiration_time).astimezone(timezone.utc).isoformat()
+
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         c.execute(
@@ -270,7 +274,7 @@ def insert_or_update_alert(alert_id, event, details, expiration_time, locations)
                 expiration_time=excluded.expiration_time,
                 locations=excluded.locations
             """,
-            (alert_id, event, details, expiration_time, locations)
+            (alert_id, event, details, expiration_time_utc, locations)
         )
         conn.commit()
         logging.debug(f"Alert inserted/updated successfully: {alert_id}, {event}")
@@ -289,7 +293,11 @@ def remove_expired_alerts():
     """
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
-    current_time = datetime.utcnow().isoformat()
+    current_time = datetime.now(timezone.utc).isoformat()  # Use timezone-aware current time
+    logging.debug(f"Current time for expiration check: {current_time}")
+    c.execute("SELECT * FROM active_alerts WHERE expiration_time <= ?", (current_time,))
+    expired_alerts = c.fetchall()
+    logging.debug(f"Expired alerts to be removed: {expired_alerts}")
     c.execute("DELETE FROM active_alerts WHERE expiration_time <= ?", (current_time,))
     conn.commit()
     conn.close()

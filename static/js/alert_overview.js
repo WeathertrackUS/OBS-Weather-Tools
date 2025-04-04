@@ -42,6 +42,8 @@ function displayAlert(alert) {
     document.getElementById('alert-details').textContent = alert.details || 'No details available';
     document.getElementById('alert-locations').textContent = alert.locations || 'No locations specified';
     document.getElementById('alert-expiration').textContent = `Expires: ${alert.expiration_time ? new Date(alert.expiration_time).toLocaleString() : 'Unknown'}`;
+
+    enableScrollingIfNeeded(); // Check if scrolling is needed for locations
 }
 
 function displayNoAlerts() {
@@ -65,9 +67,28 @@ function cycleAlerts() {
     }
 }
 
+function enableScrollingIfNeeded() {
+    const locationsElement = document.getElementById('alert-locations');
+
+    // Measure the text width and container width
+    const textWidth = locationsElement.scrollWidth;
+    const containerWidth = locationsElement.offsetWidth;
+
+    // Check if scrolling is needed
+    if (textWidth > containerWidth) {
+        locationsElement.classList.add('scrollable');
+    } else {
+        locationsElement.classList.remove('scrollable');
+    }
+}
+
 // Fetch alerts initially and then every 5 minutes
 fetchAlerts();
 setInterval(fetchAlerts, 300000);
 
 // Cycle through alerts every 10 seconds
 setInterval(cycleAlerts, 10000);
+
+// Call the function initially and whenever the content changes
+enableScrollingIfNeeded();
+setInterval(enableScrollingIfNeeded, 1000); // Recheck periodically in case of dynamic updates

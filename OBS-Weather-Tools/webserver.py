@@ -3,12 +3,13 @@ import threading
 import time
 import os
 import logging
+import requests
 from database import insert_or_update_alert, remove_expired_alerts, fetch_active_alerts
 from datetime import datetime, timedelta, timezone
 
 # Explicitly set the template folder and static folder
 app = Flask(
-    __name__, 
+    __name__,
     template_folder=os.path.join(os.path.dirname(__file__), '../templates'),
     static_folder=os.path.join(os.path.dirname(__file__), '../static')
 )
@@ -61,34 +62,82 @@ def debug_alerts():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+# NWS API endpoint and parameters
+nws_endpoint = "https://api.weather.gov/alerts/active"
+nws_params = {
+    "status": "actual",
+    "message_type": "alert,update",
+    "code": "TOR,SVR,SVS",
+    "region_type": "land",
+    "urgency": "Immediate,Future,Expected",
+    "severity": "Extreme,Severe,Moderate",
+    "certainty": "Observed,Likely,Possible",
+    "limit": 500
+}
+
 def update_alerts():
     """
-    Simulate updating alerts periodically. Replace this with actual alert fetching logic.
+    Fetch real alerts from the NWS API and update the database.
     """
     while True:
         try:
-            now = datetime.now(timezone.utc)
-            logging.debug("Inserting test alerts into the database.")
-            insert_or_update_alert(
-                alert_id="1",
-                event="Severe Thunderstorm Warning",
-                details="Hail: <0.75 in | Wind: 60 MPH",
-                expiration_time=(now + timedelta(minutes=25)).isoformat(),
-                locations="Columbia, WI; Dane, WI"
-            )
-            insert_or_update_alert(
-                alert_id="2",
-                event="Tornado Warning",
-                details="Take shelter immediately",
-                expiration_time=(now + timedelta(minutes=15)).isoformat(),
-                locations="Northwestern LA"
-            )
-            logging.debug("Test alerts inserted successfully.")
+            response = requests.get(nws_endpoint, params=nws_params)
+            if response.status_code == 200:
+                data = response.json()
+                features = data.get("features", [])
+
+                now = datetime.now(timezone.utc)
+                for feature in features:
+                    alert_id = feature["id"]
+
+                    properties = feature["properties"]
+                    event = properties["event"]
+                    expiration_time = properties.get("expires", now.isoformat())
+                    locations = properties.get("areaDesc", "")
+
+                    parameters = properties.get("parameters", {})
+                    hail_size = parameters.get("maxHailSize", ["N/A"])[0].title()
+                    tornado_detection = parameters.get("tornadoDetection", ["N/A"])[0].title()
+                    wind_gust = parameters.get("maxWindGust", ["N/A"])[0].title()
+
+                    if event == "Tornado Warning":
+                        details = f"Tornado: {tornado_detection}, Hail Size: {hail_size}"
+                    elif event == "Severe Thunderstorm Warning":
+                        details = f"Wind Gusts: {wind_gust}, Hail Size: {hail_size}"
+                    else:
+                        details = "Details not available"
+
+                    insert_or_update_alert(
+                        alert_id=alert_id,
+                        event=event,
+                        details=details,
+                        expiration_time=expiration_time,
+                        locations=locations
+                    )
+
+                logging.debug("Real alerts fetched and updated successfully.")
+            else:
+                logging.error(f"Failed to fetch alerts: {response.status_code}")
         except Exception as e:
-            logging.error(f"Error inserting test alerts: {e}")
-        time.sleep(300)  # Update every 5 minutes
+            logging.error(f"Error fetching alerts: {e}")
+
+        time.sleep(60)  # Wait for 1 minute before fetching alerts again
+
+def clear_database():
+    """
+    Clears all records from the active alerts table in the database when the application is launched.
+    """
+    from database import clear_database
+    try:
+        clear_database('active_alerts')
+        logging.debug("Database cleared successfully on application launch.")
+    except Exception as e:
+        logging.error(f"Error clearing database: {e}")
 
 if __name__ == '__main__':
+    # Clear the database on application launch
+    clear_database()
+
     # Start the alert updating thread
     alert_thread = threading.Thread(target=update_alerts, daemon=True)
     alert_thread.start()

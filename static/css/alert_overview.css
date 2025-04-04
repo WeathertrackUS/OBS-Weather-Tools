@@ -36,7 +36,8 @@ body {
     flex: 0 1 auto; /* Dynamically adjust width to text */
     font-size: 22px;
     font-weight: bold;
-    text-transform: uppercase;
+    text-transform: camelcase; /* Changed to camelcase for better readability */
+    display: flex;
     text-align: left;
     padding: 5px 90px; /* Increased padding for better spacing */
     background: linear-gradient(to right, #ffcc00, #ff9900);
@@ -44,7 +45,6 @@ body {
     border-radius: 5px;
     margin-right: 2px; /* Reduced the margin between the alert name and the description text */
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
     margin-bottom: 0; /* Removed unnecessary bottom margin */
     transition: color 0.5s ease-in-out, background 0.5s ease-in-out; /* Smooth transition for text and background changes */
@@ -64,11 +64,13 @@ body {
     margin: 0; /* Removed any extra margins */
     padding: 0 5px; /* Reduced padding for tighter alignment */
     text-align: left;
-    overflow: hidden;
+    overflow: hidden; /* Ensure content stays within bounds */
     text-overflow: ellipsis;
     white-space: nowrap;
     color: #000;
     transition: color 0.5s ease-in-out, background 0.5s ease-in-out; /* Smooth transition for text and background changes */
+    animation: none; /* Removed scrolling animation */
+    position: relative; /* Ensure scrolling stays within boundaries */
 }
 
 .alert-details {
@@ -77,7 +79,7 @@ body {
     padding-right: 15px;
     margin: 0px;
     overflow-y: auto; /* Added to allow scrolling if content overflows */
-    max-width: 25%; /* Added to limit width and allow scrolling */
+    max-width: 30%; /* Added to limit width and allow scrolling */
 }
 
 .alert-locations {
@@ -85,8 +87,9 @@ body {
     padding-left: 20px;
     padding-right: 15px;
     margin: 0px;
-    overflow-y: auto; /* Added to allow scrolling if content overflows */
-    max-width: 25%;
+    overflow: hidden; /* Ensure content stays within bounds */
+    white-space: nowrap; /* Ensure content stays on a single line */
+    animation: scroll-text 10s linear infinite; /* Automatic scrolling */
 }
 
 .alert-expiration {
@@ -95,6 +98,19 @@ body {
     overflow-y: auto;
     margin: 0px;
     padding-left: 20px;
+}
+
+.alert-details.scrollable, .alert-locations.scrollable, .alert-expiration.scrollable {
+    animation: scroll-text 10s linear infinite; /* Add scrolling animation only if overflow occurs */
+}
+
+@keyframes scroll-text {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-100% + 100%)); /* Scroll only within bounds */
+    }
 }
 
 /* Background colors for different alert types */

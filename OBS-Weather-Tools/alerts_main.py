@@ -5,7 +5,10 @@ import time
 from obswebsocket.exceptions import ConnectionFailure
 import sqlite3  # Add SQLite for tracking processed alerts
 import threading
+import logging
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # OBS WebSocket settings
 obs_socket_ip = "192.168.1.231"
@@ -248,37 +251,42 @@ def fetch_alerts(stop_event):
     """
     global active_alerts
     while not stop_event.is_set():
-        if response.status_code == 200:
-            data = response.json()
-            features = data["features"]
+        try:
+            if response.status_code == 200:
+                data = response.json()
+                features = data["features"]
 
-            new_alerts = []
-            for feature in features:
-                alert_id = feature["id"]  # Each alert has a unique ID
-                if is_alert_processed(alert_id):
-                    continue  # Skip already processed alerts
+                new_alerts = []
+                for feature in features:
+                    alert_id = feature["id"]  # Each alert has a unique ID
+                    if is_alert_processed(alert_id):
+                        continue  # Skip already processed alerts
 
-                properties = feature["properties"]
-                event = properties["event"]
-                description = properties["description"]
-                areadesc = properties["areaDesc"]
-                instruction = properties["instruction"]
+                    properties = feature["properties"]
+                    event = properties["event"]
+                    description = properties["description"]
+                    areadesc = properties["areaDesc"]
+                    instruction = properties["instruction"]
 
-                headline = properties.get("headline", "")
-                warning_text = (
-                    f'{headline} for {areadesc}. Protective Actions: {instruction}'
-                    if headline
-                    else f'{description}   Protective Actions: {instruction}'
-                )
+                    headline = properties.get("headline", "")
+                    warning_text = (
+                        f'{headline} for {areadesc}. Protective Actions: {instruction}'
+                        if headline
+                        else f'{description}   Protective Actions: {instruction}'
+                    )
 
-                new_alerts.append({"id": alert_id, "event": event, "warning_text": warning_text})
-                mark_alert_as_processed(alert_id)  # Mark the alert as processed
+                    new_alerts.append({"id": alert_id, "event": event, "warning_text": warning_text})
+                    mark_alert_as_processed(alert_id)  # Mark the alert as processed
 
-            # Replace the global active_alerts list with the new alerts
-            active_alerts = new_alerts
+                # Replace the global active_alerts list with the new alerts
+                active_alerts = new_alerts
+                logging.debug(f"Fetched and processed alerts: {new_alerts}")
 
-        else:
-            print(f"Failed to fetch alerts: {response.status_code}")
+            else:
+                logging.error(f"Failed to fetch alerts: {response.status_code}")
+
+        except Exception as e:
+            logging.error(f"Error fetching alerts: {e}")
 
         time.sleep(300)  # Wait for 5 minutes before fetching alerts again
 
