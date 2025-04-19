@@ -4,7 +4,7 @@ import time
 import os
 import logging
 import requests
-from database import insert_or_update_alert, remove_expired_alerts, fetch_active_alerts
+from database import insert_or_update_alert, remove_expired_alerts, fetch_active_alerts, clear_database
 from datetime import datetime, timezone
 
 # Explicitly set the template folder and static folder
@@ -128,9 +128,8 @@ def update_alerts():
         time.sleep(60)  # Wait for 1 minute before fetching alerts again
 
 
-def clear_database():
+def clear():
     """Clears all records from the active alerts table in the database when the application is launched."""
-    from database import clear_database
     try:
         clear_database('active_alerts')
         logging.debug("Database cleared successfully on application launch.")
@@ -140,7 +139,7 @@ def clear_database():
 
 if __name__ == '__main__':
     # Clear the database on application launch
-    clear_database()
+    clear()
 
     # Start the alert updating thread
     alert_thread = threading.Thread(target=update_alerts, daemon=True)
