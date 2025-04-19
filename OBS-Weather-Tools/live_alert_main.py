@@ -13,9 +13,9 @@ import pytz
 import json  # Add this import for JSON serialization
 
 # OBS WebSocket settings
-obs_socket_ip = "192.168.4.78"
+obs_socket_ip = "192.168.1.231"
 obs_socket_port = 4455
-obs_socket_password = "VJFfpubelSgccfYR"
+obs_socket_password = "KUYaPzQqResQ5CEt"
 
 # OBS source settings
 obs_source_settings_old = {
@@ -28,8 +28,8 @@ obs_source_settings_old = {
 }
 
 obs_source_settings = {
-    "Tornado Warning": "Alert-TOR",
-    "Severe Thunderstorm Warning": "Alert-SVR"
+    "Tornado Warning": "TORAlertTest",
+    "Severe Thunderstorm Warning": "SevereAlertTest"
 }
 
 '''obs_scene_ids = {

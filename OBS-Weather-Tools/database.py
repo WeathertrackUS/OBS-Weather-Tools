@@ -1,7 +1,20 @@
 import sqlite3
+from datetime import datetime, timezone
+import os
+import logging
+from dateutil import parser
 
-ALLOWED_TABLES = {'sent_alerts'}
-ALLOWED_COLUMNS = {'id', 'event', 'sent_datetime', 'expires_datetime', 'properties', 'description', 'instruction'}
+ALLOWED_TABLES = {'sent_alerts', 'active_alerts'}
+ALLOWED_COLUMNS = {'id', 'event', 'sent_datetime', 'expires_datetime', 'properties', 'description', 'instruction', 'details', 'expiration_time', 'locations'}  # skipq: FLK-E501
+
+# Define the absolute path to the database file
+db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../files/alerts.db'))
+
+# Ensure the database file exists
+os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def create_table(table_name, values):
@@ -21,7 +34,7 @@ def create_table(table_name, values):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
 
     c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
@@ -50,7 +63,7 @@ def insert(identifier, table_name, **kwargs):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
 
     columns = ['id']
@@ -90,7 +103,7 @@ def get_alert(identifier, table_name):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(f"SELECT * FROM {table_name} WHERE id = ?", (identifier,))  # skipcq: BAN-B608
     alert = c.fetchone()
@@ -114,7 +127,7 @@ def get_all_alerts(table_name):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(f"SELECT * FROM {table_name}")  # skipcq: BAN-B608
     alerts = c.fetchall()
@@ -139,7 +152,7 @@ def remove_alert(identifier, table_name):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(f"DELETE FROM {table_name} WHERE id = ?", (identifier,))  # skipcq: BAN-B608
     conn.commit()
@@ -163,7 +176,7 @@ def alert_exists(identifier, table_name):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(f"SELECT COUNT(*) FROM {table_name} WHERE id = ?", (identifier,))  # skipcq: BAN-B608
     count = c.fetchone()[0]
@@ -189,7 +202,7 @@ def update(identifier, table_name, **kwargs):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
 
     set_clauses = []
@@ -225,8 +238,94 @@ def clear_database(table_name):
     if table_name not in ALLOWED_TABLES:
         raise ValueError("Invalid table name")
 
-    conn = sqlite3.connect('files/alerts.db')
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(f'DELETE FROM {table_name}')  # skipcq: BAN-B608
     conn.commit()
     conn.close()
+
+
+def insert_or_update_alert(alert_id, event, details, expiration_time, locations):
+    """
+    Inserts a new alert or updates an existing one in the database.
+
+    Parameters:
+        alert_id (str): The unique ID of the alert.
+        event (str): The name of the alert event.
+        details (str): Additional details about the alert.
+        expiration_time (str): The expiration time of the alert (ISO format).
+        locations (str): The locations affected by the alert.
+
+    Returns:
+        None
+    """
+    try:
+        # Parse the expiration time and convert to UTC
+        expiration_time_utc = parser.isoparse(expiration_time).astimezone(timezone.utc).isoformat()
+
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute(
+            """
+            INSERT INTO active_alerts (id, event, details, expiration_time, locations)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+                event=excluded.event,
+                details=excluded.details,
+                expiration_time=excluded.expiration_time,
+                locations=excluded.locations
+            """,
+            (alert_id, event, details, expiration_time_utc, locations)
+        )
+        conn.commit()
+        logging.debug(f"Alert inserted/updated successfully: {alert_id}, {event}")
+    except Exception as e:
+        logging.error(f"Error inserting/updating alert: {e}")
+    finally:
+        conn.close()
+
+
+def remove_expired_alerts():
+    """
+    Removes alerts from the database that have expired.
+
+    Returns:
+        None
+    """
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+    current_time = datetime.now(timezone.utc).isoformat()  # Use timezone-aware current time
+    logging.debug(f"Current time for expiration check: {current_time}")
+    c.execute("SELECT * FROM active_alerts WHERE expiration_time <= ?", (current_time,))
+    expired_alerts = c.fetchall()
+    logging.debug(f"Expired alerts to be removed: {expired_alerts}")
+    c.execute("DELETE FROM active_alerts WHERE expiration_time <= ?", (current_time,))
+    conn.commit()
+    conn.close()
+
+
+def fetch_active_alerts():
+    """
+    Fetches all active alerts from the database.
+
+    Returns:
+        list: A list of active alerts.
+    """
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+    c.execute("SELECT * FROM active_alerts")
+    alerts = c.fetchall()
+    conn.close()
+    return alerts
+
+
+# Create the table for active alerts
+create_table('active_alerts', '''
+    (
+        id TEXT PRIMARY KEY,
+        event TEXT,
+        details TEXT,
+        expiration_time TEXT,
+        locations TEXT
+    )
+''')
