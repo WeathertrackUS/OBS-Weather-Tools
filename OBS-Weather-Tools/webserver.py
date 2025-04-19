@@ -5,7 +5,7 @@ import os
 import logging
 import requests
 from database import insert_or_update_alert, remove_expired_alerts, fetch_active_alerts
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 # Explicitly set the template folder and static folder
 app = Flask(
@@ -22,23 +22,17 @@ current_alerts = []
 
 @app.before_request
 def log_request_info():
-    """
-    Log information about incoming requests.
-    """
+    """Log information about incoming requests."""
     logging.debug(f"Request to {request.path} with method {request.method}")
 
 @app.route('/')
 def index():
-    """
-    Serve the main webpage with the alert scroll.
-    """
+    """Serve the main webpage with the alert scroll."""
     return render_template('index.html')
 
 @app.route('/alerts', methods=['GET'])
 def get_alerts():
-    """
-    API endpoint to fetch the current active alerts for the scroll.
-    """
+    """API endpoint to fetch the current active alerts for the scroll."""
     logging.debug("Fetching active alerts from the database.")
     remove_expired_alerts()  # Clean up expired alerts
     alerts = fetch_active_alerts()
@@ -59,10 +53,7 @@ def get_alerts():
 
 @app.route('/debug/alerts', methods=['GET'])
 def debug_alerts():
-    """
-    Debug route to fetch all alerts from the database.
-    """
-    from database import fetch_active_alerts
+    """Debug route to fetch all alerts from the database."""
     try:
         alerts = fetch_active_alerts()
         return jsonify(alerts)
@@ -83,9 +74,7 @@ nws_params = {
 }
 
 def update_alerts():
-    """
-    Fetch real alerts from the NWS API and update the database.
-    """
+    """Fetch real alerts from the NWS API and update the database."""
     while True:
         try:
             response = requests.get(nws_endpoint, params=nws_params)
@@ -133,9 +122,7 @@ def update_alerts():
         time.sleep(60)  # Wait for 1 minute before fetching alerts again
 
 def clear_database():
-    """
-    Clears all records from the active alerts table in the database when the application is launched.
-    """
+    """Clears all records from the active alerts table in the database when the application is launched."""
     from database import clear_database
     try:
         clear_database('active_alerts')

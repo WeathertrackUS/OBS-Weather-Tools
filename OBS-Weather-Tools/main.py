@@ -119,8 +119,6 @@ def confirm_action():
         None
     """
     logging.debug("Confirm action called.")
-    # skipcq: PYL-W0603
-    global alerts_thread
     if live_alert_var.get():
         if not alerts_thread or not alerts_thread.is_alive():  # skipcq: PYL-E0601
             alert_stop_event.clear()
