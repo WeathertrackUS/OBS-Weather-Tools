@@ -5,7 +5,7 @@ import logging
 from dateutil import parser
 
 ALLOWED_TABLES = {'sent_alerts', 'active_alerts'}
-ALLOWED_COLUMNS = {'id', 'event', 'sent_datetime', 'expires_datetime', 'properties', 'description', 'instruction', 'details', 'expiration_time', 'locations'}
+ALLOWED_COLUMNS = {'id', 'event', 'sent_datetime', 'expires_datetime', 'properties', 'description', 'instruction', 'details', 'expiration_time', 'locations'}  #skipq: FLK-E501
 
 # Define the absolute path to the database file
 db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../files/alerts.db'))

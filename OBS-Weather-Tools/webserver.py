@@ -20,15 +20,18 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 # Global variable to store the current alert scroll content
 current_alerts = []
 
+
 @app.before_request
 def log_request_info():
     """Log information about incoming requests."""
     logging.debug(f"Request to {request.path} with method {request.method}")
 
+
 @app.route('/')
 def index():
     """Serve the main webpage with the alert scroll."""
     return render_template('index.html')
+
 
 @app.route('/alerts', methods=['GET'])
 def get_alerts():
@@ -51,6 +54,7 @@ def get_alerts():
     logging.debug(f"Active alerts fetched: {alerts}")
     return jsonify(alerts)
 
+
 @app.route('/debug/alerts', methods=['GET'])
 def debug_alerts():
     """Debug route to fetch all alerts from the database."""
@@ -59,6 +63,7 @@ def debug_alerts():
         return jsonify(alerts)
     except Exception as e:
         return jsonify({"error": str(e)})
+
 
 # NWS API endpoint and parameters
 nws_endpoint = "https://api.weather.gov/alerts/active"
@@ -72,6 +77,7 @@ nws_params = {
     "certainty": "Observed,Likely,Possible",
     "limit": 500
 }
+
 
 def update_alerts():
     """Fetch real alerts from the NWS API and update the database."""
@@ -121,6 +127,7 @@ def update_alerts():
 
         time.sleep(60)  # Wait for 1 minute before fetching alerts again
 
+
 def clear_database():
     """Clears all records from the active alerts table in the database when the application is launched."""
     from database import clear_database
@@ -129,6 +136,7 @@ def clear_database():
         logging.debug("Database cleared successfully on application launch.")
     except Exception as e:
         logging.error(f"Error clearing database: {e}")
+
 
 if __name__ == '__main__':
     # Clear the database on application launch
@@ -139,4 +147,4 @@ if __name__ == '__main__':
     alert_thread.start()
 
     # Run the Flask webserver
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='127.0.0.1', port=5000)
