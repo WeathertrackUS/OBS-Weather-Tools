@@ -16,20 +16,26 @@
 wsl --install
 ```
 
-2.Verify and set WSL2 as default:
+2. Verify and set WSL2 as default:
 
 ```powershell
 wsl --version
 wsl --set-default-version 2
 ```
 
-3.Install Ubuntu from Microsoft Store and create user account when prompted
+3. Install Ubuntu from Microsoft Store and create user account when prompted
 
-4.Update Ubuntu (in WSL2 terminal):
+4. Update Ubuntu (in WSL2 terminal):
 
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
+
+## VS Code Setup
+
+1. Install the WSL Extension for VS Code
+
+2. Hit the `F1` key and select the `WSL: Connect to WSL using Distro...` and select Ubuntu
 
 ## Redis Setup in WSL2
 
@@ -164,6 +170,7 @@ Add this configuration:
     missingok
     create 640 redis redis
 }
+```
 
 ## Python Environment
 
