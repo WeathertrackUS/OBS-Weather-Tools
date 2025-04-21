@@ -4,7 +4,7 @@ import sys
 
 async def verify_environment():
     print(f"Python Version: {sys.version}")
-    
+
     try:
         r = redis.Redis(host='localhost', port=6379, decode_responses=True)
         await r.set('test', 'Environment OK')
