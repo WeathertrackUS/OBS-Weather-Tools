@@ -34,39 +34,136 @@ sudo apt update && sudo apt upgrade -y
 ## Redis Setup in WSL2
 
 1. Install Redis:
-
 ```bash
+# Update package list first
+sudo apt update
+# Install Redis server
 sudo apt install redis-server
 ```
 
 2. Edit Redis configuration:
-
 ```bash
 sudo nano /etc/redis/redis.conf
 ```
 
-3. Update these settings:
-
+3. Update these configuration settings:
 ```conf
+# Bind to localhost only for security
 bind 127.0.0.1
+# Standard Redis port
 port 6379
+# Set memory limit for WSL2 environment
 maxmemory 512mb
+# Memory management policy
 maxmemory-policy allkeys-lru
+# Enable AOF persistence for data durability
+appendonly yes
+appendfsync everysec
+# Basic security settings
+protected-mode yes
 ```
 
-4. Start and enable Redis:
-
+4. Start and enable Redis service:
 ```bash
+# Start Redis server
 sudo service redis-server start
+# Enable Redis to start on boot
 sudo systemctl enable redis-server
+# Verify service status
+sudo systemctl status redis-server
 ```
 
-5. Test Redis:
-
+5. Test Redis connection:
 ```bash
+# Simple connection test
 redis-cli ping
 # Should return "PONG"
+
+# Extended test with data operations
+redis-cli << EOF
+SET test "Hello"
+GET test
+DEL test
+EOF
 ```
+
+### Redis Configuration Validation
+
+To verify your Redis setup is correct, run these checks:
+
+1. Check Redis service status:
+```bash
+sudo systemctl status redis-server
+```
+
+2. Verify memory settings:
+```bash
+redis-cli INFO memory | grep used_memory_human
+```
+
+3. Check persistence configuration:
+```bash
+redis-cli CONFIG GET appendonly
+redis-cli CONFIG GET appendfsync
+```
+
+### Troubleshooting Redis
+
+Common issues and solutions:
+
+1. Redis won't start:
+```bash
+# Check logs for errors
+sudo tail -f /var/log/redis/redis-server.log
+# Verify permissions
+sudo chown -R redis:redis /var/lib/redis
+```
+
+2. Connection refused:
+```bash
+# Check if Redis is listening
+sudo netstat -tlpn | grep redis
+# Verify bind address in config
+sudo grep "bind" /etc/redis/redis.conf
+```
+
+3. Memory issues:
+```bash
+# Monitor memory usage
+redis-cli INFO memory
+# Clear all data if needed
+redis-cli FLUSHALL
+```
+
+### Redis Health Monitoring
+
+Set up basic monitoring:
+
+1. Check real-time metrics:
+```bash
+# Monitor command latency
+redis-cli --latency
+
+# Watch live commands
+redis-cli MONITOR
+```
+
+2. Configure log rotation:
+```bash
+sudo nano /etc/logrotate.d/redis-server
+```
+
+Add this configuration:
+```conf
+/var/log/redis/redis-server.log {
+    weekly
+    rotate 7
+    compress
+    delaycompress
+    notifempty
+    missingok
+    create 640 redis redis
+}
 
 ## Python Environment
 
@@ -112,14 +209,14 @@ import sys
 
 async def verify_environment():
     print(f"Python Version: {sys.version}")
-    
+
     try:
         r = redis.Redis(host='localhost', port=6379, decode_responses=True)
         await r.set('test', 'Environment OK')
         result = await r.get('test')
         await r.delete('test')
         await r.close()
-        
+
         print("Redis Connection: Success")
         print(f"Test Result: {result}")
         return True
