@@ -2,7 +2,17 @@ import redis.asyncio as redis
 import asyncio
 import sys
 
+
 async def verify_environment():
+    """
+    Verifies the Python environment and Redis connection.
+
+    Prints the Python version and attempts to connect to Redis,
+    set a test key, retrieve it, and delete it.
+
+    Returns:
+        bool: True if the environment and Redis connection are okay, False otherwise.
+    """
     print(f"Python Version: {sys.version}")
 
     try:
