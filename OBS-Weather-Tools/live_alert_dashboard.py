@@ -8,6 +8,7 @@ import re
 from collections import OrderedDict
 import json  # Use json instead of ast for safer deserialization
 from dateutil import parser  # Add this import for better date parsing
+import logging  # Add this import for logging
 
 base_dir = '.'
 
@@ -167,7 +168,13 @@ def fetch_and_update_alerts():  # skipcq: PY-R1000
 
         alert_endtime = properties["expires"]
         alert_endtime_tz_offset = alert_endtime[-6:]  # Extract the timezone offset from the string
-        alert_endtime_naive = datetime.strptime(alert_endtime[:-6], "%Y-%m-%dT%H:%M:%S")  # Parse the datetime part without the offset
+
+        # Ensure the 'expires' field is in the correct format
+        try:
+            alert_endtime_naive = datetime.strptime(alert_endtime[:-6], "%Y-%m-%dT%H:%M:%S")  # Parse the datetime part without the offset
+        except ValueError as e:
+            logging.error(f"Error parsing 'expires' field: {alert_endtime}. Skipping alert. Error: {e}")
+            continue
 
         # Create a timezone object from the offset
         offset_hours = int(alert_endtime_tz_offset[:3])

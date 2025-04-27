@@ -14,7 +14,7 @@ db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../files/aler
 os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def create_table(table_name, values):
     """

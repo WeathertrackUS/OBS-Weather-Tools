@@ -13,9 +13,9 @@ import pytz
 import json  # Add this import for JSON serialization
 
 # OBS WebSocket settings
-obs_socket_ip = "192.168.1.231"
+obs_socket_ip = "192.168.4.78"
 obs_socket_port = 4455
-obs_socket_password = "KUYaPzQqResQ5CEt"
+obs_socket_password = "VJFfpubelSgccfYR"
 
 # OBS source settings
 obs_source_settings_old = {
@@ -601,7 +601,7 @@ def display_alert(event, notification_message, area_desc):
     ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
     ws.connect()
 
-    source_name = obs_source_settings.get(event)
+    source_name = obs_source_settings_old.get(event)
     if source_name:  # Check if source_name is not None
         scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
         if all((scene_name, scene_uuid, scene_item_id)):  # Check if we got all the values

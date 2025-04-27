@@ -10,7 +10,7 @@ import database
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 logging.debug("Starting OBS Weather Tools main.py")
 
@@ -35,6 +35,7 @@ live_alert_var = tkinter.BooleanVar()
 dashboard_var = tkinter.BooleanVar()
 spc_outlook_var = tkinter.BooleanVar()
 alert_scroll_var = tkinter.BooleanVar()
+test_alerts_var = tkinter.BooleanVar()  # New variable for test alerts
 
 
 def update_dashboard_state(*args):
@@ -157,7 +158,7 @@ alert_scroll_checkbox = ctk.CTkCheckBox(main_frame, text="Alert Scroll (Beta)", 
 alert_scroll_checkbox.grid(row=4, column=0, padx=10, pady=10)
 
 confirm_button = ctk.CTkButton(main_frame, text="Confirm", command=confirm_action)
-confirm_button.grid(row=5, column=0, padx=10, pady=10)
+confirm_button.grid(row=6, column=0, padx=10, pady=10)
 
 live_alert_var.trace_add("write", update_dashboard_state)
 

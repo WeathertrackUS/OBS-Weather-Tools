@@ -13,9 +13,10 @@ body {
     width: 100%;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 200px 10px 60px; /* Maintained left and right padding */
+    align-items: flex-start; /* Align items to the top */
+    justify-content: flex-start; /* Align elements to the start horizontally */
+    padding-top: 10px;
+    padding-left: 20px;
     position: fixed;
     bottom: 0;
     font-family: 'Arial Black', sans-serif;
@@ -32,65 +33,61 @@ body {
     text-align: center;
 }
 
+/* Adjusted padding and margin to reduce the gap */
 .alert-header {
     flex: 0 1 auto; /* Dynamically adjust width to text */
     font-size: 22px;
     font-weight: bold;
     text-transform: camelcase; /* Changed to camelcase for better readability */
     display: flex;
-    text-align: left;
-    padding: 5px 90px; /* Increased padding for better spacing */
+    text-align: left; /* Ensure header text is aligned to the left */
+    padding: 5px 20px; /* Reduced padding for better alignment */
     background: linear-gradient(to right, #ffcc00, #ff9900);
     color: #fff;
     border-radius: 5px;
-    margin-right: 2px; /* Reduced the margin between the alert name and the description text */
+    margin-right: 0; /* Removed unnecessary margin */
     white-space: nowrap;
     text-overflow: ellipsis;
-    margin-bottom: 0; /* Removed unnecessary bottom margin */
+    margin-bottom: 15px; /* Restore spacing below the header */
     transition: color 0.5s ease-in-out, background 0.5s ease-in-out; /* Smooth transition for text and background changes */
 }
 
+/* Make separators dynamic and ensure locations are visible */
 .alert-horizontal {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    position: relative; /* Ensure separators are independent of text */
-    padding: 0; /* Removed extra padding */
-    margin: 0; /* Removed unnecessary margins */
+    align-items: flex-start; /* Align text to the top for proper elevation */
+    gap: 10px; /* Add spacing between sections */
+}
+
+.alert-details-container, .alert-locations-container, .alert-expiration-container {
+    flex: 1; /* Allow sections to grow equally */
+    overflow: visible; /* Ensure content is not hidden */
 }
 
 .alert-separator {
-    position: absolute;
-    height: 100%;
-    width: 2px;
-    background-color: rgba(0, 0, 0, 0.5); /* Adjusted separator color */
-    z-index: 1; /* Ensure separators appear above the background */
-}
-
-.alert-separator.left {
-    left: 33%; /* Position the left separator */
-}
-
-.alert-separator.right {
-    right: 33%; /* Position the right separator */
+    flex: 0 0 2px; /* Keep separators fixed in width */
+    background-color: rgba(0, 0, 0, 0.7); /* Ensure separators are visible */
+    height: auto; /* Adjust height dynamically */
+    align-self: stretch; /* Stretch separators to match section height */
 }
 
 .alert-details, .alert-locations, .alert-expiration {
-    flex: 1;
-    text-align: center;
+    flex: 2; /* Increase space allocation for better visibility */
+    text-align: left; /* Ensure description text is aligned to the left */
     overflow: hidden; /* Ensure content stays within bounds */
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0 5px; /* Reduced padding for tighter alignment */
-    max-width: 33%; /* Ensure sections stay within their bounds */
+    padding: 0; /* Remove unnecessary padding */
+    max-width: none; /* Remove width constraints */
     position: relative;
     z-index: 2; /* Ensure text appears above separators */
 }
 
 .alert-details {
     border-right: 1px;
-    padding-left: 20px;
-    padding-right: 15px;
+    padding-left: 10px; /* Reduced left padding */
+    padding-right: 10px; /* Reduced right padding */
     margin: 0px;
     overflow-y: auto; /* Added to allow scrolling if content overflows */
 }
@@ -100,18 +97,19 @@ body {
     position: relative; /* Ensure child elements are positioned relative to this container */
 }
 
+/* Ensure `.alert-locations` is fully visible */
 .alert-locations {
-    overflow: hidden; /* Prevent content from overflowing */
-    white-space: nowrap; /* Prevent wrapping */
+    position: relative; /* Ensure it is positioned relative to its container */
+    overflow: visible; /* Allow content to be fully visible */
+    white-space: normal; /* Allow text to wrap */
     animation: scroll-text 10s linear infinite; /* Automatic scrolling */
-    position: absolute; /* Ensure scrolling happens within the container */
 }
 
 .alert-expiration {
-    padding-right: 150px; /* Removed right padding for better alignment */
+    padding-right: 10px; /* Reduced right padding */
     overflow-y: auto;
     margin: 0px;
-    padding-left: 20px;
+    padding-left: 10px; /* Reduced left padding */
 }
 
 .alert-details.scrollable, .alert-locations.scrollable, .alert-expiration.scrollable {
