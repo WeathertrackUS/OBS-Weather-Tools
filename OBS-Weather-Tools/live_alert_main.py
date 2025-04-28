@@ -604,7 +604,7 @@ def display_alert(event, notification_message, area_desc):
     ws = obsws(obs_socket_ip_star, obs_socket_port, obs_socket_password_star)
     ws.connect()
 
-    source_name = obs_source_settings_old.get(event)
+    source_name = obs_source_settings.get(event)
     if source_name:  # Check if source_name is not None
         scene_name, scene_uuid, scene_item_id = get_scene_and_source_info(source_name)
         if all((scene_name, scene_uuid, scene_item_id)):  # Check if we got all the values
