@@ -13,9 +13,12 @@ import pytz
 import json  # Add this import for JSON serialization
 
 # OBS WebSocket settings
-obs_socket_ip = "192.168.4.78"
+obs_socket_ip_star = "192.168.1.231"
+obs_socket_ip_super = "192.168.4.78"
 obs_socket_port = 4455
-obs_socket_password = "VJFfpubelSgccfYR"
+obs_socket_password_star = "KUYaPzQqResQ5CEt"
+obs_socket_password_super = "VJFfpubelSgccfYR"
+
 
 # OBS source settings
 obs_source_settings_old = {
@@ -390,7 +393,7 @@ def get_current_scene():
         tuple: A tuple containing the name and scene UUID of the current scene.
     """
     # Connect to the OBS WebSocket
-    ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+    ws = obsws(obs_socket_ip_star, obs_socket_port, obs_socket_password_star)
     ws.connect()
     current_scene = ws.call(obs_requests.GetCurrentProgramScene())
     ws.disconnect()
@@ -410,7 +413,7 @@ def get_source_id(source_name, scene_name, scene_uuid):
         str: The source ID of the specified source, or None if not found.
     """
     # Connect to the OBS WebSocket
-    ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+    ws = obsws(obs_socket_ip_star, obs_socket_port, obs_socket_password_star)
     ws.connect()
     scene_items = ws.call(obs_requests.GetSceneItemList(sceneName=scene_name, sceneUuid=scene_uuid))
     for item in scene_items.get("sceneItems", []):
@@ -432,12 +435,12 @@ def get_scene_and_source_info(source_name):
         tuple: A tuple containing the name, UUID, and scene item ID of the current scene and source if found,
                otherwise None, None, None.
     """
-    if not obs_socket_ip or not obs_socket_port or not obs_socket_password:
+    if not obs_socket_ip_star or not obs_socket_port or not obs_socket_password_star:
         return None, None, None
 
     try:
         # Connect to the OBS WebSocket
-        ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+        ws = obsws(obs_socket_ip_star, obs_socket_port, obs_socket_password_star)
         ws.connect()
 
         scenes_response = ws.call(obs_requests.GetSceneList())
@@ -598,7 +601,7 @@ def display_alert(event, notification_message, area_desc):
     time.sleep(2)
 
     # Connect to the OBS WebSocket
-    ws = obsws(obs_socket_ip, obs_socket_port, obs_socket_password)
+    ws = obsws(obs_socket_ip_star, obs_socket_port, obs_socket_password_star)
     ws.connect()
 
     source_name = obs_source_settings_old.get(event)
