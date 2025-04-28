@@ -20,12 +20,13 @@ body {
     position: fixed;
     bottom: 0;
     font-family: 'Arial Black', sans-serif;
-    transition: all 1s ease-in-out, opacity 1s ease-in-out; /* Extended duration and added opacity transition */
-    opacity: 1;
+    transition: all 1s ease-in-out, opacity 2s ease-in-out; /* Extended duration and added opacity transition */
+    animation: none; /* Disable the fade-in-out animation */
+    opacity: 1; /* Ensure full visibility without transitions */
 }
 
 .alert-container.hidden {
-    opacity: 0; /* Fade out effect for smoother transitions */
+    opacity: 0.75; /* Fade out effect for smoother transitions */
 }
 
 .alert-content {
@@ -58,11 +59,26 @@ body {
     justify-content: space-between;
     align-items: flex-start; /* Align text to the top for proper elevation */
     gap: 10px; /* Add spacing between sections */
+    padding-top: 8px;
+    padding-left: 15px;
 }
 
-.alert-details-container, .alert-locations-container, .alert-expiration-container {
-    flex: 1; /* Allow sections to grow equally */
-    overflow: visible; /* Ensure content is not hidden */
+/* Extend the space for locations text */
+.alert-locations-container {
+    flex: 2; /* Allocate more space to the locations section */
+    overflow: hidden; /* Prevent scrolling outside the container */
+    position: relative; /* Ensure child elements are positioned relative to this container */
+    padding-right: 5px; /* Add padding to prevent text clipping */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally if needed */
+}
+
+.alert-details-container, .alert-expiration-container {
+    flex: 1; /* Keep other sections balanced */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally if needed */
 }
 
 .alert-separator {
@@ -73,36 +89,33 @@ body {
 }
 
 .alert-details, .alert-locations, .alert-expiration {
-    flex: 2; /* Increase space allocation for better visibility */
+    flex: 3; /* Increase space allocation for better visibility */
     text-align: left; /* Ensure description text is aligned to the left */
     overflow: hidden; /* Ensure content stays within bounds */
-    text-overflow: ellipsis;
     white-space: nowrap;
     padding: 0; /* Remove unnecessary padding */
     max-width: none; /* Remove width constraints */
     position: relative;
     z-index: 2; /* Ensure text appears above separators */
+    display: inline-block; /* Ensure text remains inline */
 }
 
 .alert-details {
     border-right: 1px;
     padding-left: 10px; /* Reduced left padding */
     padding-right: 10px; /* Reduced right padding */
+    padding-bottom: 2px; /* Minimized bottom padding */
     margin: 0px;
     overflow-y: auto; /* Added to allow scrolling if content overflows */
 }
 
-.alert-locations-container {
-    overflow: hidden; /* Prevent scrolling outside the container */
-    position: relative; /* Ensure child elements are positioned relative to this container */
-}
-
-/* Ensure `.alert-locations` is fully visible */
+/* Adjust `.alert-locations` to ensure full visibility */
 .alert-locations {
-    position: relative; /* Ensure it is positioned relative to its container */
-    overflow: visible; /* Allow content to be fully visible */
-    white-space: normal; /* Allow text to wrap */
-    animation: scroll-text 10s linear infinite; /* Automatic scrolling */
+    overflow: visible; /* Allow content to extend beyond bounds */
+    padding-right: 5px; /* Add padding to prevent clipping */
+    white-space: nowrap; /* Prevent text wrapping */
+    position: relative; /* Ensure proper positioning */
+    animation: none; /* Reset animation */
 }
 
 .alert-expiration {

@@ -77,19 +77,27 @@ function cycleAlerts() {
 }
 
 function enableScrollingIfNeeded() {
-    const locationsContainer = document.getElementById('alert-locations-container');
     const locationsElement = document.getElementById('alert-locations');
+    const containerElement = locationsElement.parentElement;
 
-    // Measure the text width and container width
+    // Get the actual width of the container and text
+    const containerWidth = containerElement.getBoundingClientRect().width;
     const textWidth = locationsElement.scrollWidth;
-    const containerWidth = locationsContainer.offsetWidth;
+
+    // Add a small buffer to the container width to prevent cutting off the text
+    const adjustedContainerWidth = containerWidth; // Subtract 5px as a buffer
 
     // Check if scrolling is needed
-    if (textWidth > containerWidth) {
-        locationsElement.classList.add('scrollable');
+    if (textWidth > adjustedContainerWidth) {
+        // Enable scrolling if text exceeds container width
+        const animationDuration = Math.max(10, (textWidth / adjustedContainerWidth) * 10); // Adjust duration proportionally
+        locationsElement.style.animation = `scroll-continuous ${animationDuration}s linear infinite`;
     } else {
-        locationsElement.classList.remove('scrollable');
+        // Disable scrolling if text fits within the container
+        locationsElement.style.animation = 'none';
     }
+
+    console.debug(`Container width: ${containerWidth}, Adjusted width: ${adjustedContainerWidth}, Text width: ${textWidth}`); // Debugging output
 }
 
 // Fetch alerts initially and then every 5 minutes
@@ -97,8 +105,29 @@ fetchAlerts();
 setInterval(fetchAlerts, 300000);
 
 // Cycle through alerts every 10 seconds
-setInterval(cycleAlerts, 10000);
+setInterval(cycleAlerts, 30000);
 
 // Call the function initially and whenever the content changes
 enableScrollingIfNeeded();
 setInterval(enableScrollingIfNeeded, 1000); // Recheck periodically in case of dynamic updates
+
+function enableContinuousScrolling() {
+    const locationsElement = document.getElementById('alert-locations');
+
+    // Avoid duplicating text if already duplicated
+    if (!locationsElement.dataset.duplicated) {
+        const originalText = locationsElement.textContent;
+        locationsElement.innerHTML = `${originalText} &nbsp;&nbsp;&nbsp; ${originalText}`;
+        locationsElement.dataset.duplicated = true; // Mark as duplicated
+    }
+
+    // Apply scrolling animation dynamically
+    const textWidth = locationsElement.scrollWidth / 2; // Width of the original text
+    const containerWidth = locationsElement.parentElement.offsetWidth;
+    const animationDuration = Math.max(10, (textWidth / containerWidth) * 10); // Adjust duration proportionally
+
+    locationsElement.style.animation = `scroll-continuous ${animationDuration}s linear infinite`;
+}
+
+enableContinuousScrolling();
+setInterval(enableContinuousScrolling, 1000); // Recheck periodically in case of dynamic updates
